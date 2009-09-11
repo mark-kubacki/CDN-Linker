@@ -75,9 +75,6 @@ to ensure your CDN service is fully working before saving changes.</p>
 <br />
 <br />
 <form method="post" action="">
-<?php
-// wp_nonce_field('update-options');
-?>
 <table class="form-table">
 <tr valign="top">
 <th scope="row"><label for="ossdl_off_cdn_url">off-site URL</label></th>
