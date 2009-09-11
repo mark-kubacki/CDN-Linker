@@ -1,0 +1,73 @@
+=== Plugin Name ===
+Contributors: wmark
+Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8149246
+Tags: CDN,links,cloudfront,simplecdn,
+Requires at least: 2.7
+Tested up to: 2.8.4
+Stable tag: 1.0
+
+Rewrites links to static files to your own CDN network.
+
+== Description ==
+
+Replaces the blog URL by another for all files under `wp-content` and `wp-includes` by an other URL.
+That way static content can be handled by a CDN by origin pull. (The origin is your blog address.)
+
+You could upload your static files to S3, CloudFront or just any site, too.
+For S3/Cloudfront, see [this script](http://mark.ossdl.de/2009/09/how-to-copy-your-wordpress-files-to-cloudfront-efficiently/ "how to copy your Wordpress files to CloudFront efficiently")
+to help you with uploading/synchronizing your blog files.
+
+== Installation ==
+
+1. Setup your CDN: Either configure an origin pull, mirror bucket or upload your static files somewhere.
+2. Upload `ossdl-cdn.php` to the `/wp-content/plugins/` directory.
+3. Activate the plugin through the 'Plugins' menu in WordPress.
+4. Provide the URL where your static files can be found under Settings.
+
+== Frequently Asked Questions ==
+
+= How to uninstall? =
+
+Either deactivate the plugin or delete the `ossdl-cdn.php` file.
+
+= Why another such plugin? =
+
+As many WP plugins don't correctly include JS and CSS files most of the current CDN plugins cannot
+rewrite links correctly. They rely on the high-level WP API.
+
+This plugin does its rewriting on the lowest level possible - PHP itself.
+
+= How does it work? =
+
+After your blog pages have been rendered but before sending them to the visitor,
+it will rewrite links pointing to `wp-content` and `wp-includes`. That rewriting will simply
+replace your blog URL with that you have entered in Settings screen.
+
+Thus files are pulled from the other site.
+
+= Is it compatible to plugin XY? =
+
+Yes, by design it is compatible to all plugins. It hooks into a PHP function ([ob_start](http://us2.php.net/manual/en/function.ob-start.php "function documentation"))
+and there does the string replacement. Therefore, no Wordpress function is altered, overwritten or modified in any way.
+
+Indeed, you could even copy this plugin's rewriter into any arbitrary PHP software.
+
+= Where can I see it in action? =
+
+On my own blog, [Mark's blog](http://mark.ossdl.de/ "Mark's blog"). See the source code of any page.
+
+= Will it work with my CDN? =
+
+Yes, if it supports origin pull (aka mirror bucket, some sort of caching). Or if you upload your files manually.
+
+= What other plugins do you recommend? =
+
+Now that you can offload all the static files, such as images, you should try to serve your blog posts as static files.
+I recommend [SuperCache-Plus](http://murmatrons.armadillo.homeip.net/features/experimental-eaccelerator-wp-super-cache "Wordpress SuperCache-Plus")
+as it will generate, maintain and update that static files from dynamic content for you.
+The off-linker is compatible.
+
+== Changelog ==
+
+= 1.0 =
+* Initial version, as published on my blog.

@@ -69,12 +69,9 @@ if ( isset($_POST['action']) && ( $_POST['action'] == 'update_ossdl_off' )){
 <p>Many Wordpress plugins misbehave when linking to their JS or CSS files, and yet there is no filter to let your old posts point to a statics' site or CDN for images.
 Therefore this plugin replaces at any links into <code>wp-content</code> and <code>wp-includes</code> directories (except for PHP files) the <code>blog_url</code> by the URL you provide below.
 That way you can either copy all the static content to a dedicated host or mirror the files at a CDN by <a href="http://knowledgelayer.softlayer.com/questions/365/How+does+Origin+Pull+work%3F" target="_blank">origin pull</a>.</p>
-<br />
-<p><strong style="color:red;"> WARNING:</strong> Test some static urls e.g., http://static.mydomain.com/wp-includes/js/prototype.js<br/>
+<p><strong style="color: red">WARNING:</strong> Test some static urls e.g., http://static.mydomain.com/wp-includes/js/prototype.js<br/>
 to ensure your CDN service is fully working before saving changes.</p>
-<br />
-<br />
-<form method="post" action="">
+<p><form method="post" action="">
 <table class="form-table">
 <tr valign="top">
 <th scope="row"><label for="ossdl_off_cdn_url">off-site URL</label></th>
@@ -86,7 +83,7 @@ to ensure your CDN service is fully working before saving changes.</p>
 <p class="submit">
 <input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
 </p>
-</form>
+</form></p>
 </div>
 <?php
 }
