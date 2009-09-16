@@ -1,16 +1,16 @@
 === Plugin Name ===
 Contributors: wmark
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8149246
-Tags: CDN,links,cloudfront,simplecdn,
+Tags: CDN,links,cloudfront,simplecdn,media,performance,distribution,accelerator,content,speed,cloud
 Requires at least: 2.7
 Tested up to: 2.8.4
-Stable tag: 1.0
+Stable tag: 1.0.1
 
 Rewrites links to static files to your own CDN network.
 
 == Description ==
 
-Replaces the blog URL by another for all links pointing to `wp-content` and `wp-includes`, except PHP files.
+Replaces the blog URL by another for all files under `wp-content` and `wp-includes`.
 That way static content can be handled by a CDN by origin pull. (The origin is your blog address.)
 
 You could upload your static files to S3, CloudFront or just any site, too.
@@ -32,36 +32,33 @@ Either deactivate the plugin or delete the `ossdl-cdn.php` file.
 
 = Why another such plugin? =
 
-As many WP plugins don't include JS and CSS files by the high-level WP API,
-most of the current CDN plugins cannot rewrite links correctly.
-This plugin does its rewriting on the lowest level possible - PHP itself.
+As many WP plugins don't correctly include JS and CSS files most of the current CDN plugins cannot
+rewrite links correctly. They rely on the high-level WP API.
 
-Additionaly, none rewrites links in posts to static files such as ZIPs, images and the such.
-With this one you can virtually pull almost everything from CDN.
+This plugin does its rewriting on the lowest level possible - PHP itself.
 
 = How does it work? =
 
 After your blog pages have been rendered but before sending them to the visitor,
 it will rewrite links pointing to `wp-content` and `wp-includes`. That rewriting will simply
-replace your blog URL by that you have entered in Settings screen.
+replace your blog URL with that you have entered in Settings screen.
 
-Thus files are pulled from the other site, decreasing load on the site serving your blog.
+Thus files are pulled from the other site.
 
 = Is it compatible to plugin XY? =
 
-Yes, by design it is compatible to all plugins. It hooks into a PHP function
-([ob_start](http://us2.php.net/manual/en/function.ob-start.php "function documentation"))
+Yes, by design it is compatible to all plugins. It hooks into a PHP function ([ob_start](http://us2.php.net/manual/en/function.ob-start.php "function documentation"))
 and there does the string replacement. Therefore, no Wordpress function is altered, overwritten or modified in any way.
 
 Indeed, you could even copy this plugin's rewriter into any arbitrary PHP software.
 
-= Will it work with my CDN? =
-
-Yes, if it supports origin pull (aka mirror bucket, some sort of caching). Or if you upload your files manually.
-
 = Where can I see it in action? =
 
 On my own blog, [Mark's blog](http://mark.ossdl.de/ "Mark's blog"). See the source code of any page.
+
+= Will it work with my CDN? =
+
+Yes, if it supports origin pull (aka mirror bucket, some sort of caching). Or if you upload your files manually.
 
 = What other plugins do you recommend? =
 
@@ -74,3 +71,6 @@ The off-linker is compatible.
 
 = 1.0 =
 * Initial version, as published on my blog.
+
+= 1.0.1 =
+* Support for off-loading files in root directory, such as `favicon.ico` or `apple-touch-icon.png`.
