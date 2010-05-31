@@ -3,7 +3,7 @@ Contributors: wmark
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8149246
 Tags: CDN,links,cloudfront,simplecdn,media,performance,distribution,accelerator,content,speed,cloud
 Requires at least: 2.7
-Tested up to: 2.8.4
+Tested up to: 2.9.2
 Stable tag: 1.0.1
 
 Rewrites links to static files to your own CDN network.
@@ -41,7 +41,7 @@ This plugin does its rewriting on the lowest level possible - PHP itself.
 
 After your blog pages have been rendered but before sending them to the visitor,
 it will rewrite links pointing to `wp-content` and `wp-includes`. That rewriting will simply
-replace your blog URL with that you have entered in Settings screen.
+replace your blog URL with that you have entered in settings screen.
 
 Thus files are pulled from the other site.
 
@@ -60,11 +60,16 @@ On my own blog, [Mark's blog](http://mark.ossdl.de/ "Mark's blog"). See the sour
 
 Yes, if it supports origin pull (aka mirror bucket, some sort of caching). Or if you upload your files manually.
 
+= What about Amazon's S3? =
+
+Right, S3 doesn't support origin pull. You will have to upload your files by hand.
+I've written a script for this, too, so it is just a matter of running it. It is linked on the bottom of my blog post about [copying files to CloudFront](http://mark.ossdl.de/2009/09/how-to-copy-your-wordpress-files-to-cloudfront-efficiently/ "how to copy your Wordpress files to CloudFront efficiently").
+
 = What other plugins do you recommend? =
 
-Now that you can offload all the static files, such as images, you should try to serve your blog posts as static files.
+Now that you can offload all the files such as images, music or CSS, you should serve your blog posts as static files to decrease load on your server.
 I recommend [SuperCache-Plus](http://murmatrons.armadillo.homeip.net/features/experimental-eaccelerator-wp-super-cache "Wordpress SuperCache-Plus")
-as it will generate, maintain and update that static files from dynamic content for you.
+as it will maintain, update and create that static files from dynamic content for you.
 The off-linker is compatible.
 
 == Changelog ==
