@@ -3,8 +3,8 @@ Contributors: wmark
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8149246
 Tags: CDN,links,cloudfront,simplecdn,media,performance,distribution,accelerator,content,speed,cloud
 Requires at least: 2.7
-Tested up to: 2.9.2
-Stable tag: 1.0.1
+Tested up to: 3.0.0
+Stable tag: 1.0.2
 
 Rewrites links to static files to your own CDN network.
 
@@ -72,10 +72,19 @@ I recommend [SuperCache-Plus](http://murmatrons.armadillo.homeip.net/features/ex
 as it will maintain, update and create that static files from dynamic content for you.
 The off-linker is compatible.
 
+= I discovered a bug! =
+
+Share it with me! The rarer a species, the more interesting. But I will need its habitat, too.
+Therefore, please send me at least one page with the plugin turned off and on, as attachment.
+
 == Changelog ==
 
-= 1.0 =
-* Initial version, as published on my blog.
+= 1.0.2 =
+* rewriting of URLs from embedded `style=xy:url(...)` CSS attributes
+* fixed: wrongful rewrite of links into the blogs root directory (thanks to Greg Winn for reporting)
 
 = 1.0.1 =
-* Support for off-loading files in root directory, such as `favicon.ico` or `apple-touch-icon.png`.
+* support for off-loading files in root directory, such as `favicon.ico` or `apple-touch-icon.png`
+
+= 1.0 =
+* initial version, as published on my blog
