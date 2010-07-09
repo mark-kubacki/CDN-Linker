@@ -11,9 +11,13 @@ Author URI: http://mark.ossdl.de/
 add_option('ossdl_off_cdn_url', get_option('siteurl'));
 $ossdl_off_blog_url = get_option('siteurl');
 $ossdl_off_cdn_url = trim(get_option('ossdl_off_cdn_url'));
+add_option('ossdl_off_include_dirs');
+$ossdl_off_include_dirs = trim(get_option('ossdl_off_include_dirs'));
 
 /**
  * Rewriter of URLs, used as replace-callback.
+ *
+ * Called by #ossdl_off_filter.
  */
 function ossdl_off_rewriter($match) {
 	global $ossdl_off_blog_url, $ossdl_off_cdn_url;
@@ -27,6 +31,21 @@ function ossdl_off_rewriter($match) {
 }
 
 /**
+ * Creates a regexp compatible pattern from the directories to be included in matching.
+ *
+ * @return String with the pattern with {@literal |} as prefix, or empty
+ */
+function ossdl_off_additional_directories() {
+	global $ossdl_off_include_dirs;
+	$input = explode(',', $ossdl_off_include_dirs);
+	if (count($input) < 1) {
+		return '';
+	} else {
+		return '|'.implode('|', array_map('quotemeta', array_map('trim', $input)));
+	}
+}
+
+/**
  * Output filter which runs the actual plugin logic.
  */
 function ossdl_off_filter($content) {
@@ -34,7 +53,8 @@ function ossdl_off_filter($content) {
 	if ($ossdl_off_blog_url == $ossdl_off_cdn_url) { // no rewrite needed
 		return $content;
 	} else {
-		$regex = '#(?<=[(\"\'])'.quotemeta($ossdl_off_blog_url).'(?:(/(?:wp\-content|wp\-includes)[^\"\')]+)|(/[^/\"\']+\.[^/\"\')]+))(?=[\"\')])#';
+		$dirs = ossdl_off_additional_directories();
+		$regex = '#(?<=[(\"\'])'.quotemeta($ossdl_off_blog_url).'(?:(/(?:wp\-content|wp\-includes'.$dirs.')[^\"\')]+)|(/[^/\"\']+\.[^/\"\')]+))(?=[\"\')])#';
 		return preg_replace_callback($regex, 'ossdl_off_rewriter', $content);
 	}
 }
@@ -75,7 +95,14 @@ function ossdl_off_options() {
 				<th scope="row"><label for="ossdl_off_cdn_url">off-site URL</label></th>
 				<td>
 					<input type="text" name="ossdl_off_cdn_url" value="<?php echo get_option('ossdl_off_cdn_url'); ?>" size="64" class="regular-text code" />
-					<span class="description">The new URL to be used in place of <?php echo get_option('siteurl'); ?> for rewriting. E.g. <code><?php echo str_replace('http://', 'http://cdn.', str_replace('www.', '', get_option('siteurl'))); ?></code>.</span>
+					<span class="description">The new URL to be used in place of <?php echo get_option('siteurl'); ?> for rewriting. No trailing <code>/</code> please. E.g. <code><?php echo str_replace('http://', 'http://cdn.', str_replace('www.', '', get_option('siteurl'))); ?></code>.</span>
+				</td>
+			</tr>
+			<tr valign="top">
+				<th scope="row"><label for="ossdl_off_include_dirs">include dirs</label></th>
+				<td>
+					<input type="text" name="ossdl_off_include_dirs" value="<?php echo get_option('ossdl_off_include_dirs'); ?>" size="64" class="regular-text code" />
+					<span class="setting-description">Directories to include in static file matching. Use a comma as the delimiter. E.g. <code>ads, audio</code> or leave blank to disable.</span>
 				</td>
 			</tr>
 		</tbody></table>
