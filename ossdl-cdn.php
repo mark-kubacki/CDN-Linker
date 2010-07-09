@@ -99,6 +99,8 @@ function ossdl_off_menu() {
 function ossdl_off_options() {
 	if ( isset($_POST['action']) && ( $_POST['action'] == 'update_ossdl_off' )){
 		update_option('ossdl_off_cdn_url', $_POST['ossdl_off_cdn_url']);
+		update_option('ossdl_off_include_dirs', $_POST['ossdl_off_include_dirs']);
+		update_option('ossdl_off_exclude', $_POST['ossdl_off_exclude']);
 	}
 
 	?><div class="wrap">
