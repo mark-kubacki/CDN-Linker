@@ -75,7 +75,7 @@ That way you can either copy all the static content to a dedicated host or mirro
 <tr valign="top">
 <th scope="row"><label for="ossdl_off_cdn_url">off-site URL</label></th>
 <td><input type="text" name="ossdl_off_cdn_url" value="<?php echo get_option('ossdl_off_cdn_url'); ?>" size="64" /></td>
-<td><span class="setting-description">The new URL to be used in place of <?php echo get_option('siteurl'); ?> for rewriting.</span></td>
+<td><span class="setting-description">The new URL to be used in place of <?php echo get_option('siteurl'); ?> for rewriting. E.g. <code><?php echo str_replace('http://', 'http://cdn.', str_replace('www.', '', get_option('siteurl'))); ?></code>.</span></td>
 </tr>
 </table>
 <input type="hidden" name="action" value="update_ossdl_off" />
