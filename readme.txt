@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: CDN,links,cloudfront,simplecdn,media,performance,distribution,accelerator,content,speed,cloud
 Requires at least: 2.7
 Tested up to: 3.0
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 
 Rewrites links to static files to your own CDN network.
 
@@ -78,6 +78,9 @@ Share it with me! The rarer a species, the more interesting. But I will need its
 Therefore, please send me at least one page with the plugin turned off and on, as attachment.
 
 == Changelog ==
+
+= 1.1.1 =
+* version bump due to Wordpress' plugin page having released the plugin prematurely
 
 = 1.1.0 =
 * an input field has been added for defining matches that shall be excluded from rewriting
