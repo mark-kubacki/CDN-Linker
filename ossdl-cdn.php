@@ -3,7 +3,7 @@
 Plugin Name: OSSDL CDN off-linker
 Plugin URI: http://mark.ossdl.de/2009/08/rewriting-urls-for-wordpress-and-cdn/
 Description: Replaces the blog URL by another for all files under <code>wp-content</code> and <code>wp-includes</code>. That way static content can be handled by a CDN by origin pull - the origin being your blog address - or loaded from an other site.
-Version: 1.0.2
+Version: 1.1.0
 Author: W-Mark Kubacki
 Author URI: http://mark.ossdl.de/
 */
