@@ -13,7 +13,7 @@ $ossdl_off_blog_url = get_option('siteurl');
 $ossdl_off_cdn_url = trim(get_option('ossdl_off_cdn_url'));
 add_option('ossdl_off_include_dirs');
 $ossdl_off_include_dirs = trim(get_option('ossdl_off_include_dirs'));
-addoption('ossdl_off_exclude', '.php');
+add_option('ossdl_off_exclude', '.php');
 $ossdl_off_exclude = trim(get_option('ossdl_off_exclude'));
 
 $arr_of_excludes = array_map('trim', explode(',', $ossdl_off_exclude));
@@ -56,7 +56,7 @@ function ossdl_off_rewriter($match) {
 function ossdl_off_additional_directories() {
 	global $ossdl_off_include_dirs;
 	$input = explode(',', $ossdl_off_include_dirs);
-	if (count($input) < 1) {
+	if ($ossdl_off_include_dirs == '' || count($input) < 1) {
 		return '';
 	} else {
 		return '|'.implode('|', array_map('quotemeta', array_map('trim', $input)));
@@ -72,7 +72,7 @@ function ossdl_off_filter($content) {
 		return $content;
 	} else {
 		$dirs = ossdl_off_additional_directories();
-		$regex = '#(?<=[(\"\'])'.quotemeta($ossdl_off_blog_url).'(?:(/(?:wp\-content|wp\-includes'.$dirs.')[^\"\')]+)|(/[^/\"\']+\.[^/\"\')]+))(?=[\"\')])#';
+		$regex = '#(?<=[(\"\'])'.quotemeta($ossdl_off_blog_url).'/(?:((?:wp\-content|wp\-includes'.$dirs.')[^\"\')]+)|([^/\"\']+\.[^/\"\')]+))(?=[\"\')])#';
 		return preg_replace_callback($regex, 'ossdl_off_rewriter', $content);
 	}
 }
@@ -122,14 +122,14 @@ function ossdl_off_options() {
 				<th scope="row"><label for="ossdl_off_include_dirs">include dirs</label></th>
 				<td>
 					<input type="text" name="ossdl_off_include_dirs" value="<?php echo get_option('ossdl_off_include_dirs'); ?>" size="64" class="regular-text code" />
-					<span class="setting-description">Directories to include in static file matching. Use a comma as the delimiter. E.g. <code>ads, audio</code> or leave blank to disable (default).</span>
+					<span class="description">Directories to include in static file matching. Use a comma as the delimiter. E.g. <code>ads, audio</code> or leave blank to disable (default).</span>
 				</td>
 			</tr>
 			<tr valign="top">
 				<th scope="row"><label for="ossdl_off_exclude">exclude if substring</label></th>
 				<td>
 					<input type="text" name="ossdl_off_exclude" value="<?php echo get_option('ossdl_off_exclude'); ?>" size="64" class="regular-text code" />
-					<span class="setting-description">Excludes something from being rewritten if one of the above strings is found in the match. Use a comma as the delimiter. E.g. <code>.php, .flv, .do</code>, always include <code>.php</code> (default).</span>
+					<span class="description">Excludes something from being rewritten if one of the above strings is found in the match. Use a comma as the delimiter. E.g. <code>.php, .flv, .do</code>, always include <code>.php</code> (default).</span>
 				</td>
 			</tr>
 		</tbody></table>
