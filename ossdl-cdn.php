@@ -17,7 +17,7 @@ $ossdl_off_cdn_url = trim(get_option('ossdl_off_cdn_url'));
  */
 function ossdl_off_rewriter($match) {
 	global $ossdl_off_blog_url, $ossdl_off_cdn_url;
-	$pos = strrpos($match[0], ".php");
+	$pos = stristr($match[0], ".php");
 
 	if ($pos === false) {	// not linking to PHP, we can rewrite the URL
 		return str_replace($ossdl_off_blog_url, $ossdl_off_cdn_url, $match[0]);
