@@ -11,7 +11,7 @@ Author URI: http://mark.ossdl.de/
 add_option('ossdl_off_cdn_url', get_option('siteurl'));
 $ossdl_off_blog_url = get_option('siteurl');
 $ossdl_off_cdn_url = trim(get_option('ossdl_off_cdn_url'));
-add_option('ossdl_off_include_dirs');
+add_option('ossdl_off_include_dirs', 'wp-content,wp-includes');
 $ossdl_off_include_dirs = trim(get_option('ossdl_off_include_dirs'));
 add_option('ossdl_off_exclude', '.php');
 $ossdl_off_exclude = trim(get_option('ossdl_off_exclude'));
@@ -57,9 +57,9 @@ function ossdl_off_additional_directories() {
 	global $ossdl_off_include_dirs;
 	$input = explode(',', $ossdl_off_include_dirs);
 	if ($ossdl_off_include_dirs == '' || count($input) < 1) {
-		return '';
+		return 'wp\-content|wp\-includes';
 	} else {
-		return '|'.implode('|', array_map('quotemeta', array_map('trim', $input)));
+		return implode('|', array_map('quotemeta', array_map('trim', $input)));
 	}
 }
 
@@ -72,7 +72,7 @@ function ossdl_off_filter($content) {
 		return $content;
 	} else {
 		$dirs = ossdl_off_additional_directories();
-		$regex = '#(?<=[(\"\'])'.quotemeta($ossdl_off_blog_url).'/(?:((?:wp\-content|wp\-includes'.$dirs.')[^\"\')]+)|([^/\"\']+\.[^/\"\')]+))(?=[\"\')])#';
+		$regex = '#(?<=[(\"\'])'.quotemeta($ossdl_off_blog_url).'/(?:((?:'.$dirs.')[^\"\')]+)|([^/\"\']+\.[^/\"\')]+))(?=[\"\')])#';
 		return preg_replace_callback($regex, 'ossdl_off_rewriter', $content);
 	}
 }
@@ -122,7 +122,7 @@ function ossdl_off_options() {
 				<th scope="row"><label for="ossdl_off_include_dirs">include dirs</label></th>
 				<td>
 					<input type="text" name="ossdl_off_include_dirs" value="<?php echo get_option('ossdl_off_include_dirs'); ?>" size="64" class="regular-text code" />
-					<span class="description">Directories to include in static file matching. Use a comma as the delimiter. E.g. <code>ads, audio</code> or leave blank to disable (default).</span>
+					<span class="description">Directories to include in static file matching. Use a comma as the delimiter. Default is <code>wp-content, wp-includes</code>, which will be enforced if this field is left empty.</span>
 				</td>
 			</tr>
 			<tr valign="top">
