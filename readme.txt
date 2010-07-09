@@ -80,6 +80,7 @@ Therefore, please send me at least one page with the plugin turned off and on, a
 == Changelog ==
 
 = 1.1.0 =
+* list input for having matches excluded
 * added the feature to include additional (to `wp-content` and `wp-includes`) directories for rewriting
 * fixed: bug which messed with urls located at the root level of the site, introduced in 1.0.2 (thanks to Vic Holtreman for reporting)
 

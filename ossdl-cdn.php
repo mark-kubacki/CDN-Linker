@@ -13,6 +13,26 @@ $ossdl_off_blog_url = get_option('siteurl');
 $ossdl_off_cdn_url = trim(get_option('ossdl_off_cdn_url'));
 add_option('ossdl_off_include_dirs');
 $ossdl_off_include_dirs = trim(get_option('ossdl_off_include_dirs'));
+addoption('ossdl_off_exclude', '.php');
+$ossdl_off_exclude = trim(get_option('ossdl_off_exclude'));
+
+$arr_of_excludes = array_map('trim', explode(',', $ossdl_off_exclude));
+
+/**
+ * Determines whether to exclude a match.
+ *
+ * @param String $match URI to examine
+ * @param Array $excludes array of "badwords"
+ * @return Boolean true if to exclude given match from rewriting
+ */
+function ossdl_off_exclude_match($match, $excludes) {
+	foreach ($excludes as $badword) {
+		if (stristr($match, $badword) != false) {
+			return true;
+		}
+	}
+	return false;
+}
 
 /**
  * Rewriter of URLs, used as replace-callback.
@@ -20,13 +40,11 @@ $ossdl_off_include_dirs = trim(get_option('ossdl_off_include_dirs'));
  * Called by #ossdl_off_filter.
  */
 function ossdl_off_rewriter($match) {
-	global $ossdl_off_blog_url, $ossdl_off_cdn_url;
-	$pos = stristr($match[0], ".php");
-
-	if ($pos === false) {	// not linking to PHP, we can rewrite the URL
+	global $ossdl_off_blog_url, $ossdl_off_cdn_url, $arr_of_excludes;
+	if (ossdl_off_exclude_match($match[0], $arr_of_excludes)) {
+		return $match[0];
+	} else {
 		return str_replace($ossdl_off_blog_url, $ossdl_off_cdn_url, $match[0]);
-	} else {		// ... else, if it is a PHP, do...
-		return $match[0];// nothing
 	}
 }
 
@@ -102,7 +120,14 @@ function ossdl_off_options() {
 				<th scope="row"><label for="ossdl_off_include_dirs">include dirs</label></th>
 				<td>
 					<input type="text" name="ossdl_off_include_dirs" value="<?php echo get_option('ossdl_off_include_dirs'); ?>" size="64" class="regular-text code" />
-					<span class="setting-description">Directories to include in static file matching. Use a comma as the delimiter. E.g. <code>ads, audio</code> or leave blank to disable.</span>
+					<span class="setting-description">Directories to include in static file matching. Use a comma as the delimiter. E.g. <code>ads, audio</code> or leave blank to disable (default).</span>
+				</td>
+			</tr>
+			<tr valign="top">
+				<th scope="row"><label for="ossdl_off_exclude">exclude if substring</label></th>
+				<td>
+					<input type="text" name="ossdl_off_exclude" value="<?php echo get_option('ossdl_off_exclude'); ?>" size="64" class="regular-text code" />
+					<span class="setting-description">Excludes something from being rewritten if one of the above strings is found in the match. Use a comma as the delimiter. E.g. <code>.php, .flv, .do</code>, always include <code>.php</code> (default).</span>
 				</td>
 			</tr>
 		</tbody></table>
