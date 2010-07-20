@@ -6,6 +6,13 @@ Description: Replaces the blog URL by another for all files under <code>wp-conte
 Version: 1.1.1
 Author: W-Mark Kubacki
 Author URI: http://mark.ossdl.de/
+License: RPL for non-commercial
+
+Data flow of this plugin is as follows:
+Final (raw) HTML --> intercepted in PHP's ob_start() --> ossdl_off_filter() --> PHP --> HTTP server
+
+Control flow is this (begin reading with ossdl_off_filter()):
+ossdl_off_additional_directories <-- ossdl_off_filter --> ossdl_off_rewriter --> ossdl_off_exclude_match
 */
 
 add_option('ossdl_off_cdn_url', get_option('siteurl'));
@@ -35,9 +42,10 @@ function ossdl_off_exclude_match($match, $excludes) {
 }
 
 /**
- * Rewriter of URLs, used as replace-callback.
+ * Rewriter of URLs, used as callback for rewriting in {@link ossdl_off_filter}.
  *
- * Called by #ossdl_off_filter.
+ * @param String $match An URI as candidate for rewriting
+ * @return String the unmodified URI if it is not to be rewritten, otherwise a modified one pointing to CDN
  */
 function ossdl_off_rewriter($match) {
 	global $ossdl_off_blog_url, $ossdl_off_cdn_url, $arr_of_excludes;
@@ -51,7 +59,7 @@ function ossdl_off_rewriter($match) {
 /**
  * Creates a regexp compatible pattern from the directories to be included in matching.
  *
- * @return String with the pattern with {@literal |} as prefix, or empty
+ * @return String regexp pattern for those directories, or empty if none are given
  */
 function ossdl_off_additional_directories() {
 	global $ossdl_off_include_dirs;
@@ -65,6 +73,9 @@ function ossdl_off_additional_directories() {
 
 /**
  * Output filter which runs the actual plugin logic.
+ *
+ * @param String $content the raw HTML of the page from Wordpress, meant to be returned to the requester but intercepted here
+ * @return String modified HTML with replaced links - will be served by the HTTP server to the requester
  */
 function ossdl_off_filter($content) {
 	global $ossdl_off_blog_url, $ossdl_off_cdn_url;
@@ -79,6 +90,8 @@ function ossdl_off_filter($content) {
 
 /**
  * Registers ossdl_off_filter as output buffer, if needed.
+ *
+ * This function is called by Wordpress if the plugin was enabled.
  */
 function do_ossdl_off_ob_start() {
 	global $ossdl_off_blog_url, $ossdl_off_cdn_url;
