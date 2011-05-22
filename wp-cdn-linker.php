@@ -9,11 +9,6 @@ Author URI: http://mark.ossdl.de/
 License: RPL for non-commercial
 */
 
-add_option('ossdl_off_cdn_url', get_option('siteurl'));
-add_option('ossdl_off_include_dirs', 'wp-content,wp-includes');
-add_option('ossdl_off_exclude', '.php');
-add_option('ossdl_off_rootrelative', '');
-
 $ossdl_off_blog_url = get_option('siteurl');
 $ossdl_off_cdn_url = trim(get_option('ossdl_off_cdn_url'));
 $ossdl_off_include_dirs = trim(get_option('ossdl_off_include_dirs'));
@@ -27,6 +22,25 @@ if ( @include_once('cdn-linker-base.php') ) {
 }
 
 /********** WordPress Administrative ********/
+
+function ossdl_off_activate() {
+	add_option('ossdl_off_cdn_url', get_option('siteurl'));
+	add_option('ossdl_off_include_dirs', 'wp-content,wp-includes');
+	add_option('ossdl_off_exclude', '.php');
+	add_option('ossdl_off_rootrelative', '');
+}
+register_activation_hook( __FILE__, 'ossdl_off_activate');
+
+function ossdl_off_deactivate() {
+	delete_option('ossdl_off_cdn_url');
+	delete_option('ossdl_off_include_dirs');
+	delete_option('ossdl_off_exclude');
+	delete_option('ossdl_off_rootrelative');
+}
+// register_deactivation_hook( __FILE__, 'ossdl_off_deactivate');
+// Deactivated because: If the user activated this plugin again his previous settings would have been deleted by function.
+
+/********** WordPress Interface ********/
 add_action('admin_menu', 'ossdl_off_menu');
 
 function ossdl_off_menu() {
