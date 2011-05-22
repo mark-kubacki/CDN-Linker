@@ -3,7 +3,7 @@ Contributors: wmark
 Tags: CDN,links,cloudfront,simplecdn,media,performance,distribution,accelerator,content,speed,cloud
 Requires at least: 2.7
 Tested up to: 3.1.2
-Stable tag: 1.1.1
+Stable tag: 1.3.0
 
 Rewrites links to static files to your own CDN network.
 
@@ -78,8 +78,10 @@ Therefore, please send me at least one page with the plugin turned off and on, a
 
 == Changelog ==
 
-= 1.1.2 - on Github =
-* Optionally rewrite "root-relative" links. (As suggested by Tony Stuck. Thanks!)
+= 1.3.0 =
+* Support for multiple CDN (domain) names. (Idea by "ericesev" and "digory". You're great!)
+* New option to rewrite "root-relative" links has been added. (As suggested by Tony Stuck. Thanks!)
+* The plugin has been rewritten and received unit tests.
 
 The plugin has been
 * renamed to "CDN Linker" and

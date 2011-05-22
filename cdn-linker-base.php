@@ -1,5 +1,75 @@
 <?php
 /**
+ * Strategy for creating CDN URIs.
+ */
+interface ICdnForItemStrategy
+{
+	/**
+	 * Gets the right CDN URL for the given item.
+	 *
+	 * By modifying or overwriting this method you could, for example,
+	 * have images loaded from CDN 1 and videos from CDN 2.
+	 *
+	 * @param String $item will either be something like 'http://test.local/xyz/zdf.ext' or '/xyz/zdf.ext'
+	 * @return String contains the CDN url - e.g. 'http://cdn.test.local'
+	 */
+	public function get_for(&$item);
+
+}
+
+class OneCdnForAllStrategy implements ICdnForItemStrategy
+{
+	/** String: URL of the CDN domain */
+	var $cdn_url		= null;
+
+	function __construct($cdn_url) {
+		$this->cdn_url = $cdn_url;
+	}
+
+	public function get_for(&$item) {
+		return $this->cdn_url;
+	}
+
+}
+
+class MultipleCdnsDeterministic implements ICdnForItemStrategy
+{
+	/**
+	 * String: URL with pattern %d% for the CDN domains.
+	 * 'd' is how many variations exist.
+	 */
+	var $cdn_pattern	= null;
+	/** Number of variations. Derived from the above variable. */
+	var $variations		= 0;
+	/** Fragment, to speed up replacings. */
+	var $fragment		= null;
+
+	function __construct($cdn_pattern) {
+		preg_match('/%(\d)%/', $cdn_pattern, $m);
+		$this->variations = max($m[1], 1);
+		$this->cdn_pattern = $cdn_pattern;
+		$this->fragment = $m[0];
+	}
+
+	public function get_for(&$item) {
+		$n = ( hexdec(substr(md5($item), 0, 1)) % $this->variations ) + 1;
+		return str_replace($this->fragment, $n, $this->cdn_pattern);
+	}
+
+}
+
+/**
+ * Gets an implementation of ICdnForItemStrategy.
+ */
+function ossdl_off_cdn_strategy_for($pattern) {
+	if (preg_match('/%(\d)%/', $pattern)) {
+		return new MultipleCdnsDeterministic($pattern);
+	} else {
+		return new OneCdnForAllStrategy($pattern);
+	}
+}
+
+/**
  * Reperesents the CDN Linker's rewrite logic.
  *
  * 'rewrite' gets the raw HTML as input and returns the final result.
@@ -11,7 +81,7 @@ class CDNLinksRewriter
 {
 	/** String: the blog's URL ( get_option('siteurl') ) */
 	var $blog_url		= null;
-	/** String: URL of the CDN domain */
+	/** ICdnForItemStrategy: results in URL of a CDN domain */
 	var $cdn_url		= null;
 	/** String: directories to include in static file matching, comma-delimited list */
 	var $include_dirs	= null;
@@ -21,7 +91,7 @@ class CDNLinksRewriter
 	var $rootrelative	= false;
 
 	/** Constructor. */
-	function __construct($blog_url, $cdn_url, $include_dirs, array $excludes, $root_relative) {
+	function __construct($blog_url, ICdnForItemStrategy $cdn_url, $include_dirs, array $excludes, $root_relative) {
 		$this->blog_url		= $blog_url;
 		$this->cdn_url		= $cdn_url;
 		$this->include_dirs	= $include_dirs;
@@ -55,9 +125,9 @@ class CDNLinksRewriter
 			return $match[0];
 		} else {
 			if (!$this->rootrelative || strstr($match[0], $this->blog_url)) {
-				return str_replace($this->blog_url, $this->cdn_url, $match[0]);
+				return str_replace($this->blog_url, $this->cdn_url->get_for($match[0]), $match[0]);
 			} else { // obviously $this->rootrelative is true and we got a root-relative link - else that case won't happen
-				return $this->cdn_url . $match[0];
+				return $this->cdn_url->get_for($match[0]) . $match[0];
 			}
 		}
 	}
@@ -83,17 +153,13 @@ class CDNLinksRewriter
 	 * @return String modified HTML with replaced links - will be served by the HTTP server to the requester
 	 */
 	public function rewrite(&$content) {
-		if ($this->blog_url == $this->cdn_url) { // no rewrite needed
-			return $content;
-		} else {
-			$dirs = $this->include_dirs_to_pattern();
-			$regex = '#(?<=[(\"\'])';
-			$regex .= $this->rootrelative
-				? ('(?:'.quotemeta($this->blog_url).')?')
-				: quotemeta($this->blog_url);
-			$regex .= '/(?:((?:'.$dirs.')[^\"\')]+)|([^/\"\']+\.[^/\"\')]+))(?=[\"\')])#';
-			return preg_replace_callback($regex, array(&$this, 'rewrite_single'), $content);
-		}
+		$dirs = $this->include_dirs_to_pattern();
+		$regex = '#(?<=[(\"\'])';
+		$regex .= $this->rootrelative
+			? ('(?:'.quotemeta($this->blog_url).')?')
+			: quotemeta($this->blog_url);
+		$regex .= '/(?:((?:'.$dirs.')[^\"\')]+)|([^/\"\']+\.[^/\"\')]+))(?=[\"\')])#';
+		return preg_replace_callback($regex, array(&$this, 'rewrite_single'), $content);
 	}
 
 }
@@ -107,9 +173,10 @@ class CDNLinksRewriterWordpress extends CDNLinksRewriter
 	function __construct() {
 		$excl_tmp = trim(get_option('ossdl_off_exclude'));
 		$excludes = array_map('trim', explode(',', $excl_tmp));
+
 		parent::__construct(
 			get_option('siteurl'),
-			trim(get_option('ossdl_off_cdn_url')),
+			ossdl_off_cdn_strategy_for(trim(get_option('ossdl_off_cdn_url'))),
 			trim(get_option('ossdl_off_include_dirs')),
 			$excludes,
 			!!trim(get_option('ossdl_off_exclude'))
@@ -122,7 +189,7 @@ class CDNLinksRewriterWordpress extends CDNLinksRewriter
 	 * This function is called by Wordpress if the plugin was enabled.
 	 */
 	public function register_as_output_buffer() {
-		if ($this->blog_url != $this->cdn_url) {
+		if ($this->blog_url != trim(get_option('ossdl_off_cdn_url'))) {
 			ob_start(array(&$this, 'rewrite'));
 		}
 	}
