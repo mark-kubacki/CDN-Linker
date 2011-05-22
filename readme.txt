@@ -79,6 +79,13 @@ Therefore, please send me at least one page with the plugin turned off and on, a
 
 == Changelog ==
 
+= 1.1.2 - on Github =
+* Optionally rewrite "root-relative" links. (As suggested by Tony Stuck. Thanks!)
+
+The plugin has been
+* renamed to "CDN Linker" and
+* moved to [Github](https://github.com/wmark/CDN-Linker).
+
 = 1.1.1 =
 * version bump due to Wordpress' plugin page having released the plugin prematurely
 

@@ -5,6 +5,15 @@ Final (raw) HTML --> intercepted in PHP's ob_start() --> ossdl_off_filter() --> 
 
 Control flow is this (begin reading with ossdl_off_filter()):
 ossdl_off_additional_directories <-- ossdl_off_filter --> ossdl_off_rewriter --> ossdl_off_exclude_match
+
+As this plugin hooks into the PHP output buffer "ossdl_off_filter" cannot have any parameters (beyond the obvious one, that is.)
+Therefore these global variables are used:
+ - $ossdl_off_blog_url		String: the blog's URL ( get_option('siteurl') )
+ - $ossdl_off_cdn_url		String: URL of the CDN domain
+ - $ossdl_off_include_dirs	String: directories to include in static file matching, comma-delimited list
+ - $arr_of_excludes		Array: strings which indicate that a given element should not be rewritten (i.e., ".php")
+
+ - $ossdl_off_rootrelative	Boolean: if true, modifies root-relative links (default is false)
 */
 
 /**
@@ -30,14 +39,14 @@ function ossdl_off_exclude_match($match, $excludes) {
  * @return String the unmodified URI if it is not to be rewritten, otherwise a modified one pointing to CDN
  */
 function ossdl_off_rewriter($match) {
-	global $ossdl_off_blog_url, $ossdl_off_cdn_url, $arr_of_excludes;
+	global $ossdl_off_blog_url, $ossdl_off_cdn_url, $arr_of_excludes, $ossdl_off_rootrelative;
 	if (ossdl_off_exclude_match($match[0], $arr_of_excludes)) {
 		return $match[0];
 	} else {
 		if (!$ossdl_off_rootrelative || strstr($match[0], $ossdl_off_blog_url)) {
 			return str_replace($ossdl_off_blog_url, $ossdl_off_cdn_url, $match[0]);
 		} else { // obviously $ossdl_off_rootrelative is true aand we got a root-relative link - else that case won't happen
-			return $ossdl_off_cdn_url . '/' . $match[0];
+			return $ossdl_off_cdn_url . $match[0];
 		}
 	}
 }
@@ -64,7 +73,7 @@ function ossdl_off_additional_directories() {
  * @return String modified HTML with replaced links - will be served by the HTTP server to the requester
  */
 function ossdl_off_filter($content) {
-	global $ossdl_off_blog_url, $ossdl_off_cdn_url;
+	global $ossdl_off_blog_url, $ossdl_off_cdn_url, $ossdl_off_rootrelative;
 	if ($ossdl_off_blog_url == $ossdl_off_cdn_url) { // no rewrite needed
 		return $content;
 	} else {
