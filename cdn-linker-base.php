@@ -23,7 +23,7 @@ Therefore these global variables are used:
  * @param Array $excludes array of "badwords"
  * @return Boolean true if to exclude given match from rewriting
  */
-function ossdl_off_exclude_match($match, $excludes) {
+function ossdl_off_exclude_match(&$match, &$excludes) {
 	foreach ($excludes as $badword) {
 		if (stristr($match, $badword) != false) {
 			return true;
@@ -38,7 +38,7 @@ function ossdl_off_exclude_match($match, $excludes) {
  * @param String $match An URI as candidate for rewriting
  * @return String the unmodified URI if it is not to be rewritten, otherwise a modified one pointing to CDN
  */
-function ossdl_off_rewriter($match) {
+function ossdl_off_rewriter(&$match) {
 	global $ossdl_off_blog_url, $ossdl_off_cdn_url, $arr_of_excludes, $ossdl_off_rootrelative;
 	if (ossdl_off_exclude_match($match[0], $arr_of_excludes)) {
 		return $match[0];
@@ -72,7 +72,7 @@ function ossdl_off_additional_directories() {
  * @param String $content the raw HTML of the page from Wordpress, meant to be returned to the requester but intercepted here
  * @return String modified HTML with replaced links - will be served by the HTTP server to the requester
  */
-function ossdl_off_filter($content) {
+function ossdl_off_filter(&$content) {
 	global $ossdl_off_blog_url, $ossdl_off_cdn_url, $ossdl_off_rootrelative;
 	if ($ossdl_off_blog_url == $ossdl_off_cdn_url) { // no rewrite needed
 		return $content;
