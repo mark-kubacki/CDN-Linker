@@ -3,7 +3,7 @@
 Plugin Name: CDN Linker
 Plugin URI: https://github.com/wmark/CDN-Linker
 Description: Replaces the blog URL by another for all files under <code>wp-content</code> and <code>wp-includes</code>. That way static content can be handled by a CDN by origin pull - the origin being your blog address - or loaded from an other site.
-Version: 1.1.1
+Version: 1.1.2
 Author: W-Mark Kubacki
 Author URI: http://mark.ossdl.de/
 License: RPL for non-commercial
@@ -22,6 +22,8 @@ add_option('ossdl_off_include_dirs', 'wp-content,wp-includes');
 $ossdl_off_include_dirs = trim(get_option('ossdl_off_include_dirs'));
 add_option('ossdl_off_exclude', '.php');
 $ossdl_off_exclude = trim(get_option('ossdl_off_exclude'));
+add_option('ossdl_off_rootrelative', '');
+$ossdl_off_rootrelative = !!trim(get_option('ossdl_off_exclude'));
 
 $arr_of_excludes = array_map('trim', explode(',', $ossdl_off_exclude));
 
@@ -52,7 +54,11 @@ function ossdl_off_rewriter($match) {
 	if (ossdl_off_exclude_match($match[0], $arr_of_excludes)) {
 		return $match[0];
 	} else {
-		return str_replace($ossdl_off_blog_url, $ossdl_off_cdn_url, $match[0]);
+		if (!$ossdl_off_rootrelative || strstr($match[0], $ossdl_off_blog_url)) {
+			return str_replace($ossdl_off_blog_url, $ossdl_off_cdn_url, $match[0]);
+		} else { // obviously $ossdl_off_rootrelative is true aand we got a root-relative link - else that case won't happen
+			return $ossdl_off_cdn_url . '/' . $match[0];
+		}
 	}
 }
 
@@ -83,7 +89,11 @@ function ossdl_off_filter($content) {
 		return $content;
 	} else {
 		$dirs = ossdl_off_additional_directories();
-		$regex = '#(?<=[(\"\'])'.quotemeta($ossdl_off_blog_url).'/(?:((?:'.$dirs.')[^\"\')]+)|([^/\"\']+\.[^/\"\')]+))(?=[\"\')])#';
+		$regex = '#(?<=[(\"\'])';
+		$regex .= $ossdl_off_rootrelative
+			? ('(?:'.quotemeta($ossdl_off_blog_url).')?')
+			: quotemeta($ossdl_off_blog_url);
+		$regex .= '/(?:((?:'.$dirs.')[^\"\')]+)|([^/\"\']+\.[^/\"\')]+))(?=[\"\')])#';
 		return preg_replace_callback($regex, 'ossdl_off_rewriter', $content);
 	}
 }
@@ -130,6 +140,13 @@ function ossdl_off_options() {
 				<td>
 					<input type="text" name="ossdl_off_cdn_url" value="<?php echo(get_option('ossdl_off_cdn_url')); ?>" size="64" class="regular-text code" />
 					<span class="description">The new URL to be used in place of <?php echo(get_option('siteurl')); ?> for rewriting. No trailing <code>/</code> please. E.g. <code><?php echo($example_cdn_uri); ?></code>.</span>
+				</td>
+			</tr>
+			<tr valign="top">
+				<th scope="row"><label for="ossdl_off_rootrelative">rewrite root-relative refs</label></th>
+				<td>
+					<input type="checkbox" name="ossdl_off_rootrelative" <?php !!get_option('ossdl_off_rootrelative') ? ' checked="1"' : '' ?>" value="true" class="regular-text code" />
+					<span class="description">Check this if you want to have links like <code><em>/</em>wp-content/xyz.png</code> rewritten - i.e. without your blog's domain as prefix.</span>
 				</td>
 			</tr>
 			<tr valign="top">
