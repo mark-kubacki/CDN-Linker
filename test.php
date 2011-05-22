@@ -112,6 +112,24 @@ class CDNLinkerTest extends PHPUnit_Framework_TestCase
 				   true, 'mark.ossdl.de-before.gz', 'mark.ossdl.de-after.gz');
 	}
 
+	public function testExcludes2() {
+		// Howdyargs.com has (in this version) exceptionally ugly code.
+		// One plugin, fp-autoconnect (?), breaks w/o the particular excludes.
+		$this->ctx->blog_url = 'http://howdyags.com';
+		$this->ctx->cdn_url = 'http://cdn.howdyags.com';
+		$this->ctx->excludes = array('.php', 'xd_receiver.htm');
+		$this->ctx->rootrelative = true;
+
+		$input = $this->readCompressedSample('howdyags.com-before.gz');
+		$expected = $this->readCompressedSample('howdyags.com-after.gz');
+		$output = $this->ctx->rewrite($input);
+		$this->assertEquals($expected, $output);
+
+		$input = $expected = '<a href="http://howdyags.com/groups/site-news/">Site News</a></div> ';
+		$output = $this->ctx->rewrite($input);
+		$this->assertEquals($expected, $output);
+	}
+
 	public function testIncludeDirs() {
 		// this one has root-relative links to "/extscripts/..."
 		$this->ctx->blog_url = 'http://screenrant.com';
