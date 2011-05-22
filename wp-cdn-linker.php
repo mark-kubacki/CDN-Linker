@@ -3,19 +3,11 @@
 Plugin Name: CDN Linker
 Plugin URI: https://github.com/wmark/CDN-Linker
 Description: Replaces the blog URL by another for all files under <code>wp-content</code> and <code>wp-includes</code>. That way static content can be handled by a CDN by origin pull - the origin being your blog address - or loaded from an other site.
-Version: 1.1.2
+Version: 1.2.0
 Author: W-Mark Kubacki
 Author URI: http://mark.ossdl.de/
 License: RPL for non-commercial
 */
-
-$ossdl_off_blog_url = get_option('siteurl');
-$ossdl_off_cdn_url = trim(get_option('ossdl_off_cdn_url'));
-$ossdl_off_include_dirs = trim(get_option('ossdl_off_include_dirs'));
-$ossdl_off_exclude = trim(get_option('ossdl_off_exclude'));
-$ossdl_off_rootrelative = !!trim(get_option('ossdl_off_exclude'));
-
-$arr_of_excludes = array_map('trim', explode(',', $ossdl_off_exclude));
 
 if ( @include_once('cdn-linker-base.php') ) {
 	add_action('template_redirect', 'do_ossdl_off_ob_start');
