@@ -1,9 +1,8 @@
 === Plugin Name ===
 Contributors: wmark
-Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8149246
 Tags: CDN,links,cloudfront,simplecdn,media,performance,distribution,accelerator,content,speed,cloud
 Requires at least: 2.7
-Tested up to: 3.0
+Tested up to: 3.1.2
 Stable tag: 1.1.1
 
 Rewrites links to static files to your own CDN network.
