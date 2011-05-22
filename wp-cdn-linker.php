@@ -29,7 +29,7 @@ if ( @include_once('cdn-linker-base.php') ) {
 add_action('admin_menu', 'ossdl_off_menu');
 
 function ossdl_off_menu() {
-	add_options_page('OSSDL CDN off-linker', 'OSSDL CDN off-linker', 8, __FILE__, 'ossdl_off_options');
+	add_options_page('CDN Linker', 'CDN Linker', 8, __FILE__, 'ossdl_off_options');
 }
 
 function ossdl_off_options() {
@@ -37,6 +37,7 @@ function ossdl_off_options() {
 		update_option('ossdl_off_cdn_url', $_POST['ossdl_off_cdn_url']);
 		update_option('ossdl_off_include_dirs', $_POST['ossdl_off_include_dirs'] == '' ? 'wp-content,wp-includes' : $_POST['ossdl_off_include_dirs']);
 		update_option('ossdl_off_exclude', $_POST['ossdl_off_exclude']);
+		update_option('ossdl_off_rootrelative', !!$_POST['ossdl_off_rootrelative']);
 	}
 	$example_cdn_uri = str_replace('http://', 'http://cdn.', str_replace('www.', '', get_option('siteurl')));
 
@@ -58,7 +59,7 @@ function ossdl_off_options() {
 			<tr valign="top">
 				<th scope="row"><label for="ossdl_off_rootrelative">rewrite root-relative refs</label></th>
 				<td>
-					<input type="checkbox" name="ossdl_off_rootrelative" <?php !!get_option('ossdl_off_rootrelative') ? ' checked="1"' : '' ?>" value="true" class="regular-text code" />
+					<input type="checkbox" name="ossdl_off_rootrelative" <?php echo(!!get_option('ossdl_off_rootrelative') ? 'checked="1" ' : '') ?>value="true" class="regular-text code" />
 					<span class="description">Check this if you want to have links like <code><em>/</em>wp-content/xyz.png</code> rewritten - i.e. without your blog's domain as prefix.</span>
 				</td>
 			</tr>
