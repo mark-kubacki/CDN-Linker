@@ -1,14 +1,11 @@
 <?php
-/*
-Data flow of this plugin is as follows:
-Final (raw) HTML --> intercepted in PHP's ob_start() --> ossdl_off_filter() --> PHP --> HTTP server
-
-Control flow is this (begin reading with ossdl_off_filter()):
-ossdl_off_additional_directories <-- ossdl_off_filter --> ossdl_off_rewriter --> ossdl_off_exclude_match
-*/
-
 /**
  * Reperesents the CDN Linker's rewrite logic.
+ *
+ * 'rewrite' gets the raw HTML as input and returns the final result.
+ * It finds all links and runs them through 'rewrite_singe', which prepends the CDN domain.
+ *
+ * 'CDNLinksRewriter' contains no WP related function calls and can thus be used in testing or in other software.
  */
 class CDNLinksRewriter
 {
@@ -36,11 +33,10 @@ class CDNLinksRewriter
 	 * Determines whether to exclude a match.
 	 *
 	 * @param String $match URI to examine
-	 * @param Array $excludes array of "badwords"
 	 * @return Boolean true if to exclude given match from rewriting
 	 */
-	function ossdl_off_exclude_match(&$match, &$excludes) {
-		foreach ($excludes as $badword) {
+	protected function exclude_single(&$match) {
+		foreach ($this->excludes as $badword) {
 			if (stristr($match, $badword) != false) {
 				return true;
 			}
@@ -54,8 +50,8 @@ class CDNLinksRewriter
 	 * @param String $match An URI as candidate for rewriting
 	 * @return String the unmodified URI if it is not to be rewritten, otherwise a modified one pointing to CDN
 	 */
-	function ossdl_off_rewriter(&$match) {
-		if ($this->ossdl_off_exclude_match($match[0], $this->excludes)) {
+	protected function rewrite_single(&$match) {
+		if ($this->exclude_single($match[0])) {
 			return $match[0];
 		} else {
 			if (!$this->rootrelative || strstr($match[0], $this->blog_url)) {
@@ -71,7 +67,7 @@ class CDNLinksRewriter
 	 *
 	 * @return String regexp pattern for those directories, or empty if none are given
 	 */
-	function ossdl_off_additional_directories() {
+	protected function include_dirs_to_pattern() {
 		$input = explode(',', $this->include_dirs);
 		if ($this->include_dirs == '' || count($input) < 1) {
 			return 'wp\-content|wp\-includes';
@@ -86,22 +82,21 @@ class CDNLinksRewriter
 	 * @param String $content the raw HTML of the page from Wordpress, meant to be returned to the requester but intercepted here
 	 * @return String modified HTML with replaced links - will be served by the HTTP server to the requester
 	 */
-	function ossdl_off_filter(&$content) {
+	public function rewrite(&$content) {
 		if ($this->blog_url == $this->cdn_url) { // no rewrite needed
 			return $content;
 		} else {
-			$dirs = $this->ossdl_off_additional_directories();
+			$dirs = $this->include_dirs_to_pattern();
 			$regex = '#(?<=[(\"\'])';
 			$regex .= $this->rootrelative
 				? ('(?:'.quotemeta($this->blog_url).')?')
 				: quotemeta($this->blog_url);
 			$regex .= '/(?:((?:'.$dirs.')[^\"\')]+)|([^/\"\']+\.[^/\"\')]+))(?=[\"\')])#';
-			return preg_replace_callback($regex, array(&$this, 'ossdl_off_rewriter'), $content);
+			return preg_replace_callback($regex, array(&$this, 'rewrite_single'), $content);
 		}
 	}
 
 }
-
 
 /**
  * The rewrite logic with calls to Wordpress.
@@ -122,18 +117,17 @@ class CDNLinksRewriterWordpress extends CDNLinksRewriter
 	}
 
 	/**
-	 * Registers ossdl_off_filter as output buffer, if needed.
+	 * Registers the output buffer, if needed.
 	 *
 	 * This function is called by Wordpress if the plugin was enabled.
 	 */
-	function do_ossdl_off_ob_start() {
+	public function register_as_output_buffer() {
 		if ($this->blog_url != $this->cdn_url) {
-			ob_start(array(&$this, 'ossdl_off_filter'));
+			ob_start(array(&$this, 'rewrite'));
 		}
 	}
 
 }
-
 
 /**
  * This function actually registers the rewriter.
@@ -141,5 +135,5 @@ class CDNLinksRewriterWordpress extends CDNLinksRewriter
  */
 function do_ossdl_off_ob_start() {
 	$rewriter = new CDNLinksRewriterWordpress();
-	$rewriter->do_ossdl_off_ob_start();
+	$rewriter->register_as_output_buffer();
 }

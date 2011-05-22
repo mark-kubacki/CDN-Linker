@@ -40,14 +40,14 @@ class CDNLinkerTest extends PHPUnit_Framework_TestCase
 	public function testNoModificationIfUrlsMatch() {
 		$this->ctx->cdn_url = 'http://test.local';
 		$input = '<a href="http://test.local/favicon.ico">some text</a>';
-		$output = $this->ctx->ossdl_off_filter($input);
+		$output = $this->ctx->rewrite($input);
 		$this->assertEquals($input, $output);
 	}
 
 	public function testModifiesIfUrlsDontMatch() {
 		$input = '<a href="http://test.local/favicon.ico">some text</a>';
 		$expected = '<a href="http://cdn.test.local/favicon.ico">some text</a>';
-		$output = $this->ctx->ossdl_off_filter($input);
+		$output = $this->ctx->rewrite($input);
 		$this->assertEquals($expected, $output);
 	}
 
@@ -55,7 +55,7 @@ class CDNLinkerTest extends PHPUnit_Framework_TestCase
 		$this->ctx->rootrelative = false;
 		$input = '<a href="/favicon.ico">some text</a>';
 		$expected = '<a href="/favicon.ico">some text</a>';
-		$output = $this->ctx->ossdl_off_filter($input);
+		$output = $this->ctx->rewrite($input);
 		$this->assertEquals($expected, $output);
 	}
 
@@ -63,7 +63,7 @@ class CDNLinkerTest extends PHPUnit_Framework_TestCase
 		$this->ctx->rootrelative = true;
 		$input = '<a href="/favicon.ico"><img src="http://test.local/favicon.ico" /></a>';
 		$expected = '<a href="http://cdn.test.local/favicon.ico"><img src="http://cdn.test.local/favicon.ico" /></a>';
-		$output = $this->ctx->ossdl_off_filter($input);
+		$output = $this->ctx->rewrite($input);
 		$this->assertEquals($expected, $output);
 	}
 
@@ -71,11 +71,11 @@ class CDNLinkerTest extends PHPUnit_Framework_TestCase
 		$expected = $input = $this->readCompressedSample('virtual-1.before.gz');
 
 		$this->ctx->rootrelative = false;
-		$output = $this->ctx->ossdl_off_filter($input);
+		$output = $this->ctx->rewrite($input);
 		$this->assertEquals($expected, $output);
 
 		$this->ctx->rootrelative = true;
-		$output = $this->ctx->ossdl_off_filter($input);
+		$output = $this->ctx->rewrite($input);
 		$this->assertEquals($expected, $output);
 	}
 
@@ -83,7 +83,7 @@ class CDNLinkerTest extends PHPUnit_Framework_TestCase
 		$this->ctx->rootrelative = true;
 		$input = '<a href="/favicongetter.php"><img src="/favicon.ico" /></a>';
 		$expected = '<a href="/favicongetter.php"><img src="http://cdn.test.local/favicon.ico" /></a>';
-		$output = $this->ctx->ossdl_off_filter($input);
+		$output = $this->ctx->rewrite($input);
 		$this->assertEquals($expected, $output);
 	}
 
@@ -96,7 +96,7 @@ class CDNLinkerTest extends PHPUnit_Framework_TestCase
 
 		$input = $this->readCompressedSample($fn_before);
 		$expected = $this->readCompressedSample($fn_after);
-		$output = $this->ctx->ossdl_off_filter($input);
+		$output = $this->ctx->rewrite($input);
 		$this->assertEquals($expected, $output);
 	}
 
@@ -122,7 +122,7 @@ class CDNLinkerTest extends PHPUnit_Framework_TestCase
 		$input = $this->readCompressedSample('screenrant.com-before.gz');
 		$expected = str_replace('/extscripts/', 'http://cdn.screenrant.com/extscripts/',
 					$this->readCompressedSample('screenrant.com-after.gz'));
-		$output = $this->ctx->ossdl_off_filter($input);
+		$output = $this->ctx->rewrite($input);
 		$this->assertEquals($expected, $output);
 	}
 
