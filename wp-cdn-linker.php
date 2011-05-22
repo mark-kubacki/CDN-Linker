@@ -10,13 +10,14 @@ License: RPL for non-commercial
 */
 
 add_option('ossdl_off_cdn_url', get_option('siteurl'));
+add_option('ossdl_off_include_dirs', 'wp-content,wp-includes');
+add_option('ossdl_off_exclude', '.php');
+add_option('ossdl_off_rootrelative', '');
+
 $ossdl_off_blog_url = get_option('siteurl');
 $ossdl_off_cdn_url = trim(get_option('ossdl_off_cdn_url'));
-add_option('ossdl_off_include_dirs', 'wp-content,wp-includes');
 $ossdl_off_include_dirs = trim(get_option('ossdl_off_include_dirs'));
-add_option('ossdl_off_exclude', '.php');
 $ossdl_off_exclude = trim(get_option('ossdl_off_exclude'));
-add_option('ossdl_off_rootrelative', '');
 $ossdl_off_rootrelative = !!trim(get_option('ossdl_off_exclude'));
 
 $arr_of_excludes = array_map('trim', explode(',', $ossdl_off_exclude));
