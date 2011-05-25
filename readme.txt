@@ -3,7 +3,7 @@ Contributors: wmark
 Tags: CDN,links,cloudfront,simplecdn,media,performance,distribution,accelerator,content,speed,cloud
 Requires at least: 2.7
 Tested up to: 3.1.2
-Stable tag: 1.3.0
+Stable tag: 1.3.1
 
 Rewrites links to static files to your own CDN network.
 

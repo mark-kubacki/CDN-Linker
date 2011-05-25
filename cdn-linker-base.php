@@ -86,7 +86,7 @@ class CDNLinksRewriter
 	/** String: directories to include in static file matching, comma-delimited list */
 	var $include_dirs	= null;
 	/** Array: strings which indicate that a given element should not be rewritten (i.e., ".php") */
-	var $excludes		= null;
+	var $excludes		= array();
 	/** Boolean: if true, modifies root-relative links */
 	var $rootrelative	= false;
 
@@ -179,7 +179,7 @@ class CDNLinksRewriterWordpress extends CDNLinksRewriter
 			ossdl_off_cdn_strategy_for(trim(get_option('ossdl_off_cdn_url'))),
 			trim(get_option('ossdl_off_include_dirs')),
 			$excludes,
-			!!trim(get_option('ossdl_off_exclude'))
+			!!trim(get_option('ossdl_off_rootrelative'))
 		);
 	}
 
