@@ -16,6 +16,15 @@ You could upload your static files to S3, CloudFront or just any site, too.
 For S3/Cloudfront, see [this script](http://mark.ossdl.de/2009/09/how-to-copy-your-wordpress-files-to-cloudfront-efficiently/ "how to copy your Wordpress files to CloudFront efficiently")
 to help you with uploading/synchronizing your blog files.
 
+This `lite` version of the plugin works like the regular version but is not supported.
+You can get the regular version at [Github](https://github.com/wmark/CDN-Linker "CDN Linker at Github"), which:
+
+* Is free of charge, open source and without any ads.
+* Supported. Here is [the bug tracker](https://github.com/wmark/CDN-Linker/issues "bug tracker") if you encounter any issues.
+* Has more and advanced features.
+* Is updated more frequently. See [Downloads](https://github.com/wmark/CDN-Linker/downloads "Downloads page").
+* Quality assurance.
+
 == Installation ==
 
 1. Setup your CDN: Either configure an origin pull, mirror bucket or upload your static files somewhere.
@@ -27,7 +36,7 @@ to help you with uploading/synchronizing your blog files.
 
 = How to uninstall? =
 
-Either deactivate the plugin or delete the plugin's directory..
+Either deactivate the plugin or delete the plugin's directory.
 
 = Why another such plugin? =
 
@@ -78,6 +87,9 @@ with one click or two. Without any configuration, everything is automatic. Pleas
 
 = I discovered a bug! =
 
+If you are using the `lite` version, please upgrade.
+The following applies only to the `regular` version which you can find at [Github](https://github.com/wmark/CDN-Linker "CDN Linker at Github").
+
 Share it with me! The rarer a species, the more interesting. But I will need its habitat, too.
 Therefore, please send me at least one page with the plugin turned off and on, as attachment.
 
@@ -85,6 +97,7 @@ Therefore, please send me at least one page with the plugin turned off and on, a
 
 = 1.3.1 =
 * fixed: bug which has always enabled the feature "root-relative links"
+* Lite version. With less features, but as simple as the original.
 
 = 1.3.0 =
 * Support for multiple CDN (domain) names. (Idea by "ericesev" and "digory". You're great!)
@@ -92,6 +105,7 @@ Therefore, please send me at least one page with the plugin turned off and on, a
 * The plugin has been rewritten and received unit tests.
 
 The plugin has been
+
 * renamed to "CDN Linker" and
 * moved to [Github](https://github.com/wmark/CDN-Linker).
 
