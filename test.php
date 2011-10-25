@@ -87,6 +87,47 @@ class CDNLinkerTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($expected, $output);
 	}
 
+	public function testExcludesSomeMore() {
+		// This test is an attempt to reproduce issue #4.
+		// It is very verbosely commented because I want link to it whenever someone reports
+		// a similar issue. For that it needs to be understood even by non-programmers - or me
+		// after a while. ;-)
+		$cases = array(
+			// "login goes through CDN!"
+			'<a href="http://test.local/wp-login.php?action=logout&#038;_wpnonce=71297c3251">',
+			'<a href="/wp-login.php?action=logout&#038;_wpnonce=71297c3251">',
+			// "pingbacks..." or "external editors don't work!"
+			'<a href="http://test.local/xmlrpc.php?rsd">',
+			'空格<a href="/xmlrpc.php?rsd">',
+			'<a href="http://test.local/xmlrpc.php">',
+			'<a href="/xmlrpc.php">',
+			// "I/we cannot post nor comment!"
+			'<a href="http://test.local/wp-comments-post.php">',
+			'<a href="/wp-comments-post.php">'
+		);
+		$exclude_configurations = array(
+			// This is the default:
+			array_map('trim', explode(',', trim('.php'))),
+			// I will try really hard to cover all cases of misconfiguration here
+			// and add additional whitespace and some more stop-strings.
+			array_map('trim', explode(',', trim(' .php, .py')))
+		);
+		foreach($exclude_configurations as $excludes) {
+			foreach(array(true, false) as $rootrelative) {
+				$this->ctx->excludes = $excludes;
+				$this->ctx->rootrelative = $rootrelative;
+
+				foreach($cases as $input) {
+					$expected = $input;
+					// Output has to be unmodified.
+					$output = $this->ctx->rewrite($input);
+					$this->assertEquals($expected, $output);
+					// If it were modified, e.g. comments wouldn't work or similar things.
+				}
+			}
+		}
+	}
+
 	public function testMultipleCDNs() {
 		$this->ctx->rootrelative = true;
 		$this->ctx->cdn_url = ossdl_off_cdn_strategy_for('http://cdn%4%.test.local');
@@ -158,4 +199,3 @@ class CDNLinkerTest extends PHPUnit_Framework_TestCase
 	}
 
 }
-
