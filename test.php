@@ -184,6 +184,24 @@ class CDNLinkerTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($expected, $output);
 	}
 
+	public function testExcludes3() {
+		// 刘晖 has reported issue #4 and sent pages to reproce the issue.
+		// Let's see what has been configured to reproduce the incorrect output:
+		$this->ctx->blog_url = 'http://wangma.me';
+		$this->ctx->cdn_url = ossdl_off_cdn_strategy_for('http://cdn.wangma.me');
+
+		$this->ctx->excludes = array('.php'); //<-- this worked fine!
+		$input = $this->readCompressedSample('wangma.me-before.gz');
+		$expected = $this->readCompressedSample('wangma.me-after.gz');
+		$output = $this->ctx->rewrite($input);
+		$this->assertEquals($expected, $output);
+
+		$this->ctx->excludes = array(); //<-- this is what actually has been configured and caused the malfunction
+		$expected = $this->readCompressedSample('wangma.me-incorrect.gz');
+		$output = $this->ctx->rewrite($input);
+		$this->assertEquals($expected, $output);
+	}
+
 	public function testIncludeDirs() {
 		// this one has root-relative links to "/extscripts/..."
 		$this->ctx->blog_url = 'http://screenrant.com';
