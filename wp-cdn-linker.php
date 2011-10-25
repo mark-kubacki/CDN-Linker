@@ -43,7 +43,14 @@ function ossdl_off_options() {
 	if ( isset($_POST['action']) && ( $_POST['action'] == 'update_ossdl_off' )){
 		update_option('ossdl_off_cdn_url', $_POST['ossdl_off_cdn_url']);
 		update_option('ossdl_off_include_dirs', $_POST['ossdl_off_include_dirs'] == '' ? 'wp-content,wp-includes' : $_POST['ossdl_off_include_dirs']);
-		update_option('ossdl_off_exclude', $_POST['ossdl_off_exclude']);
+		if(strstr(get_option('ossdl_off_exclude'), '.php')) {
+			update_option('ossdl_off_exclude', $_POST['ossdl_off_exclude']);
+		} else {
+			// this forces '.php' being part of the list
+			$excludes = array_map('trim', explode(',', $_POST['ossdl_off_exclude']));
+			$excludes[] = '.php';
+			update_option('ossdl_off_exclude', implode(',', $excludes));
+		}
 		update_option('ossdl_off_rootrelative', !!$_POST['ossdl_off_rootrelative']);
 	}
 	$example_cdn_uri = str_replace('http://', 'http://cdn.', str_replace('www.', '', get_option('siteurl')));
@@ -86,7 +93,7 @@ function ossdl_off_options() {
 				<th scope="row"><label for="ossdl_off_exclude">exclude if substring</label></th>
 				<td>
 					<input type="text" name="ossdl_off_exclude" value="<?php echo(get_option('ossdl_off_exclude')); ?>" size="64" class="regular-text code" />
-					<span class="description">Excludes something from being rewritten if one of the above strings is found in the match. Use a comma as the delimiter. E.g. <code>.php, .flv, .do</code>, always include <code>.php</code> (default).</span>
+					<span class="description">Excludes something from being rewritten if one of the above strings is found in the match. Use a comma as the delimiter. E.g. <code>.php, .flv, .do</code>, always include <code>.php</code> (default and enforced if missing).</span>
 				</td>
 			</tr>
 		</tbody></table>
