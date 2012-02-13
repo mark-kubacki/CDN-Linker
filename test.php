@@ -34,6 +34,7 @@ class CDNLinkerTest extends PHPUnit_Framework_TestCase
 			'wp-content,wp-includes',
 			array('.php'),
 			false,
+			false,
 			false
 		);
 	}

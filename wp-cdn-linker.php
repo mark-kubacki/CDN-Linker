@@ -11,6 +11,7 @@ License: RPL for non-commercial
 
 if ( @include_once('cdn-linker-base.php') ) {
 	add_action('template_redirect', 'do_ossdl_off_ob_start');
+	// XXX: remove cached pages
 }
 
 /********** WordPress Administrative ********/
@@ -21,6 +22,7 @@ function ossdl_off_activate() {
 	add_option('ossdl_off_exclude', '.php');
 	add_option('ossdl_off_rootrelative', '');
 	add_option('ossdl_off_www_is_optional', '');
+	add_option('ossdl_off_cache', '');
 }
 register_activation_hook( __FILE__, 'ossdl_off_activate');
 
@@ -30,6 +32,7 @@ function ossdl_off_deactivate() {
 	delete_option('ossdl_off_exclude');
 	delete_option('ossdl_off_rootrelative');
 	delete_option('ossdl_off_www_is_optional');
+	delete_option('ossdl_off_cache');
 }
 // register_deactivation_hook( __FILE__, 'ossdl_off_deactivate');
 // Deactivated because: If the user activated this plugin again his previous settings would have been deleted by function.
@@ -55,6 +58,7 @@ function ossdl_off_options() {
 		}
 		update_option('ossdl_off_rootrelative', !!$_POST['ossdl_off_rootrelative']);
 		update_option('ossdl_off_www_is_optional', !!$_POST['ossdl_off_www_is_optional']);
+		update_option('ossdl_off_cache', !!$_POST['ossdl_off_cache']);
 	}
 	$example_cdn_uri = str_replace('http://', 'http://cdn.', str_replace('www.', '', get_option('siteurl')));
 
@@ -105,6 +109,14 @@ function ossdl_off_options() {
 				<td>
 					<input type="text" name="ossdl_off_exclude" value="<?php echo(get_option('ossdl_off_exclude')); ?>" size="64" class="regular-text code" />
 					<span class="description">Excludes something from being rewritten if one of the above strings is found in the match. Use a comma as the delimiter. E.g. <code>.php, .flv, .do</code>, always include <code>.php</code> (default and enforced if missing).</span>
+				</td>
+			</tr>
+			<tr valign="top">
+				<th scope="row"><label for="ossdl_off_cache">cache pages</label></th>
+				<td>
+					<input type="checkbox" name="ossdl_off_cache" <?php echo(!!get_option('ossdl_off_cache') ? 'checked="1" ' : '') ?>value="true" class="regular-text code" />
+					<span class="description">Will store complete pages in Redis, there in database <q>0</q> and the page's URI as key.<br />
+					Only use this if you have <i>Redis</i> installed and you're running Wordpress behind <i>Nginx</i> or <i>Tengine</i>.</span>
 				</td>
 			</tr>
 		</tbody></table>

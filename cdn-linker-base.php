@@ -1,4 +1,6 @@
 <?php
+require_once('redisent.php');
+
 /**
  * Strategy for creating CDN URIs.
  */
@@ -59,6 +61,34 @@ class MultipleCdnsDeterministic implements ICdnForItemStrategy
 }
 
 /**
+ *
+ */
+interface ICacheStrategy
+{
+	/**
+	 *
+	 */
+	public function set($url, $content);
+}
+
+/**
+ *
+ */
+class RedisCache implements ICacheStrategy
+{
+	var $redis		= null;
+
+	function __construct() {
+		$this->redis = new redisent\Redis('localhost');
+	}
+
+	public function set($url, $content) {
+		$this->redis->set($url, $content);
+	}
+
+}
+
+/**
  * Gets an implementation of ICdnForItemStrategy.
  */
 function ossdl_off_cdn_strategy_for($pattern) {
@@ -91,16 +121,28 @@ class CDNLinksRewriter
 	var $rootrelative	= false;
 	/** Boolean: if true, missing subdomain 'www' will still result in a match*/
 	var $www_is_optional	= false;
+	/** Boolean */
+	var $cache_content	= false;
+
+	/** ICacheStrategy for storing complete pages */
+	var $cache		= null;
 
 
-	/** Constructor. */
-	function __construct($blog_url, ICdnForItemStrategy $cdn_url, $include_dirs, array $excludes, $root_relative, $www_is_optional) {
+	/** Constructor.
+	 *
+	 * XXX: ICacheStrategy
+	 */
+	function __construct($blog_url, ICdnForItemStrategy $cdn_url, $include_dirs, array $excludes, $root_relative, $www_is_optional,
+			     $cache_content) {
 		$this->blog_url		= $blog_url;
 		$this->cdn_url		= $cdn_url;
 		$this->include_dirs	= $include_dirs;
 		$this->excludes		= $excludes;
 		$this->rootrelative	= $root_relative;
 		$this->www_is_optional	= $www_is_optional;
+		$this->cache_content	= $cache_content;
+
+		$this->cache		= new RedisCache();
 	}
 
 	/**
@@ -191,7 +233,30 @@ class CDNLinksRewriter
 		//      or a filename (which we spot by the dot in its filename))
 		// ... finally ending in an enclosing quotation mark or parentheses
 		$regex .= '/(?:((?:'.$dirs.')[^\"\')]+)|([^/\"\']+\.[^/\"\')]+))(?=[\"\')])#';
-		return preg_replace_callback($regex, array(&$this, 'rewrite_single'), $content);
+
+		$new_content = preg_replace_callback($regex, array(&$this, 'rewrite_single'), $content);
+
+		if ($this->cache_content) {
+			return $this->cache($new_content);
+		} else {
+			return $new_content;
+		}
+	}
+
+	/**
+	 * Stores the page contents somewhere, most probably by using the URL as key.
+	 *
+	 * @param String $content the raw HTML of the page from Wordpress, meant to be returned to the requester but intercepted here
+	 * @return String HTML
+	 */
+	public function cache(&$content) {
+		if($this->cache_content && ($_SERVER['REQUEST_METHOD'] == 'GET' || $_SERVER['REQUEST_METHOD'] == 'HEAD')) {
+			$key = $_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
+			$this->cache->set($key, $content.'<!-- served from cache using CDN Linker <https://github.com/wmark/CDN-Linker/tags> -->');
+			return $content.'<!-- CDN Linker <https://github.com/wmark/CDN-Linker/tags> page cache active -->';
+		} else {
+			return $content;
+		}
 	}
 
 }
@@ -206,13 +271,15 @@ class CDNLinksRewriterWordpress extends CDNLinksRewriter
 		$excl_tmp = trim(get_option('ossdl_off_exclude'));
 		$excludes = array_map('trim', explode(',', $excl_tmp));
 
+		$caching = !!trim(get_option('ossdl_off_cache')) && !$_COOKIE['comment_author_' . COOKIEHASH] && !is_user_logged_in();
 		parent::__construct(
 			get_option('siteurl'),
 			ossdl_off_cdn_strategy_for(trim(get_option('ossdl_off_cdn_url'))),
 			trim(get_option('ossdl_off_include_dirs')),
 			$excludes,
 			!!trim(get_option('ossdl_off_rootrelative')),
-			!!trim(get_option('ossdl_off_www_is_optional'))
+			!!trim(get_option('ossdl_off_www_is_optional')),
+			$caching
 		);
 	}
 
@@ -224,6 +291,8 @@ class CDNLinksRewriterWordpress extends CDNLinksRewriter
 	public function register_as_output_buffer() {
 		if ($this->blog_url != trim(get_option('ossdl_off_cdn_url'))) {
 			ob_start(array(&$this, 'rewrite'));
+		} else if (trim(get_option('ossdl_off_cache'))) {
+			ob_start(array(&$this, 'cache'));
 		}
 	}
 
