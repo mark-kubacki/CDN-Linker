@@ -149,15 +149,23 @@ class CDNLinksRewriter
 	/**
 	 * Output filter which runs the actual plugin logic.
 	 *
+	 * Gets the page's HTML and runs {@link rewrite_single} on every found substring.
+	 *
 	 * @param String $content the raw HTML of the page from Wordpress, meant to be returned to the requester but intercepted here
 	 * @return String modified HTML with replaced links - will be served by the HTTP server to the requester
 	 */
 	public function rewrite(&$content) {
 		$dirs = $this->include_dirs_to_pattern();
+		// string has to start with a quotation mark or parentheses
 		$regex = '#(?<=[(\"\'])';
+		// ... optionally followed by the blog url
 		$regex .= $this->rootrelative
 			? ('(?:'.quotemeta($this->blog_url).')?')
 			: quotemeta($this->blog_url);
+		// ... after that by a single dash,
+		//     (followed by a directory and some chars
+		//      or a filename (which we spot by the dot in its filename))
+		// ... finally ending in an enclosing quotation mark or parentheses
 		$regex .= '/(?:((?:'.$dirs.')[^\"\')]+)|([^/\"\']+\.[^/\"\')]+))(?=[\"\')])#';
 		return preg_replace_callback($regex, array(&$this, 'rewrite_single'), $content);
 	}
