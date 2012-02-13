@@ -3,7 +3,7 @@
 Plugin Name: CDN Linker
 Plugin URI: https://github.com/wmark/CDN-Linker
 Description: Replaces the blog URL by another for all files under <code>wp-content</code> and <code>wp-includes</code>. That way static content can be handled by a CDN by origin pull - the origin being your blog address - or loaded from an other site.
-Version: 1.3.1
+Version: 1.4.0
 Author: W-Mark Kubacki
 Author URI: http://mark.ossdl.de/
 License: RPL for non-commercial
@@ -20,6 +20,7 @@ function ossdl_off_activate() {
 	add_option('ossdl_off_include_dirs', 'wp-content,wp-includes');
 	add_option('ossdl_off_exclude', '.php');
 	add_option('ossdl_off_rootrelative', '');
+	add_option('ossdl_off_www_is_optional', '');
 }
 register_activation_hook( __FILE__, 'ossdl_off_activate');
 
@@ -28,6 +29,7 @@ function ossdl_off_deactivate() {
 	delete_option('ossdl_off_include_dirs');
 	delete_option('ossdl_off_exclude');
 	delete_option('ossdl_off_rootrelative');
+	delete_option('ossdl_off_www_is_optional');
 }
 // register_deactivation_hook( __FILE__, 'ossdl_off_deactivate');
 // Deactivated because: If the user activated this plugin again his previous settings would have been deleted by function.
@@ -52,6 +54,7 @@ function ossdl_off_options() {
 			update_option('ossdl_off_exclude', implode(',', $excludes));
 		}
 		update_option('ossdl_off_rootrelative', !!$_POST['ossdl_off_rootrelative']);
+		update_option('ossdl_off_www_is_optional', !!$_POST['ossdl_off_www_is_optional']);
 	}
 	$example_cdn_uri = str_replace('http://', 'http://cdn.', str_replace('www.', '', get_option('siteurl')));
 
@@ -80,6 +83,14 @@ function ossdl_off_options() {
 				<td>
 					<input type="checkbox" name="ossdl_off_rootrelative" <?php echo(!!get_option('ossdl_off_rootrelative') ? 'checked="1" ' : '') ?>value="true" class="regular-text code" />
 					<span class="description">Check this if you want to have links like <code><em>/</em>wp-content/xyz.png</code> rewritten - i.e. without your blog's domain as prefix.</span>
+				</td>
+			</tr>
+			<tr valign="top">
+				<th scope="row"><label for="ossdl_off_www_is_optional">subdomain 'www' is optional</label></th>
+				<td>
+					<input type="checkbox" name="ossdl_off_www_is_optional" <?php echo(!!get_option('ossdl_off_www_is_optional') ? 'checked="1" ' : '') ?>value="true" class="regular-text code" />
+					<span class="description">Check this if your blog can be accessed without a 'www' in front of its domain name. If unchecked, links with missing 'www' won't be modified.
+					Safe to say 'yes' here.</span>
 				</td>
 			</tr>
 			<tr valign="top">

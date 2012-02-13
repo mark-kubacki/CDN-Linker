@@ -89,14 +89,18 @@ class CDNLinksRewriter
 	var $excludes		= array();
 	/** Boolean: if true, modifies root-relative links */
 	var $rootrelative	= false;
+	/** Boolean: if true, missing subdomain 'www' will still result in a match*/
+	var $www_is_optional	= false;
+
 
 	/** Constructor. */
-	function __construct($blog_url, ICdnForItemStrategy $cdn_url, $include_dirs, array $excludes, $root_relative) {
+	function __construct($blog_url, ICdnForItemStrategy $cdn_url, $include_dirs, array $excludes, $root_relative, $www_is_optional) {
 		$this->blog_url		= $blog_url;
 		$this->cdn_url		= $cdn_url;
 		$this->include_dirs	= $include_dirs;
 		$this->excludes		= $excludes;
 		$this->rootrelative	= $root_relative;
+		$this->www_is_optional	= $www_is_optional;
 	}
 
 	/**
@@ -124,8 +128,12 @@ class CDNLinksRewriter
 		if ($this->exclude_single($match[0])) {
 			return $match[0];
 		} else {
-			if (!$this->rootrelative || strstr($match[0], $this->blog_url)) {
-				return str_replace($this->blog_url, $this->cdn_url->get_for($match[0]), $match[0]);
+			$blog_url = $this->blog_url;
+			if ($this->www_is_optional && $match[0]{0} != '/' && !strstr($match[0], '//www.')) {
+				$blog_url = str_replace('//www.', '//', $blog_url);
+			}
+			if (!$this->rootrelative || strstr($match[0], $blog_url)) {
+				return str_replace($blog_url, $this->cdn_url->get_for($match[0]), $match[0]);
 			} else { // obviously $this->rootrelative is true and we got a root-relative link - else that case won't happen
 				return $this->cdn_url->get_for($match[0]) . $match[0];
 			}
@@ -133,7 +141,7 @@ class CDNLinksRewriter
 	}
 
 	/**
-	 * Creates a regexp compatible pattern from the directories to be included in matching.
+	 * Creates a regexp-compatible pattern from the list of relevant directories.
 	 *
 	 * @return String regexp pattern for those directories, or empty if none are given
 	 */
@@ -143,6 +151,24 @@ class CDNLinksRewriter
 			return 'wp\-content|wp\-includes';
 		} else {
 			return implode('|', array_map('quotemeta', array_map('trim', $input)));
+		}
+	}
+
+	/**
+	 * Takes care of an optional 'www' subdomain and an optional domain name.
+	 *
+	 * @return String regexp pattern such as {@code '(?:http://(?:www\.)?example\.com)?'}
+	 */
+	protected function blog_url_to_pattern() {
+		$blog_url = quotemeta($this->blog_url);
+		$max_occurences =  1; // due to PHP's stupidity this must be a variable
+		if ($this->www_is_optional && strstr($blog_url, '//www\.')) {
+			$blog_url = str_replace('//www\.', '//(?:www\.)?', $blog_url, $max_occurences);
+		}
+		if ($this->rootrelative) {
+			return '(?:'.$blog_url.')?';
+		} else {
+			return $blog_url;
 		}
 	}
 
@@ -159,9 +185,7 @@ class CDNLinksRewriter
 		// string has to start with a quotation mark or parentheses
 		$regex = '#(?<=[(\"\'])';
 		// ... optionally followed by the blog url
-		$regex .= $this->rootrelative
-			? ('(?:'.quotemeta($this->blog_url).')?')
-			: quotemeta($this->blog_url);
+		$regex .= $this->blog_url_to_pattern();
 		// ... after that by a single dash,
 		//     (followed by a directory and some chars
 		//      or a filename (which we spot by the dot in its filename))
@@ -187,7 +211,8 @@ class CDNLinksRewriterWordpress extends CDNLinksRewriter
 			ossdl_off_cdn_strategy_for(trim(get_option('ossdl_off_cdn_url'))),
 			trim(get_option('ossdl_off_include_dirs')),
 			$excludes,
-			!!trim(get_option('ossdl_off_rootrelative'))
+			!!trim(get_option('ossdl_off_rootrelative')),
+			!!trim(get_option('ossdl_off_www_is_optional'))
 		);
 	}
 
