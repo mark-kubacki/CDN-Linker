@@ -216,4 +216,24 @@ class CDNLinkerTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($expected, $output);
 	}
 
+	public function testIncludeDirs2() {
+		// http://prettyshinysparkly.com/
+		// 2012-01-30: everything under "/images/" doesn't work if root-relative == false
+		$this->ctx->blog_url = 'http://www.prettyshinysparkly.com';
+		$this->ctx->cdn_url = ossdl_off_cdn_strategy_for('http://cdn.prettyshinysparkly.com');
+		$this->ctx->include_dirs = 'images, wp-content, wp-includes, js'; // spaces
+		$this->ctx->excludes = array_map('trim', explode(',', trim('.php, .flv, .do')));
+
+		$input = $this->readCompressedSample('prettyshinysparkly.com-before.gz');
+		$expected = $this->readCompressedSample('prettyshinysparkly.com-after.gz');
+
+		$this->ctx->rootrelative = false;
+		$output = $this->ctx->rewrite($input);
+		$this->assertEquals($expected, $output);
+
+		$this->ctx->rootrelative = true;
+		$output = $this->ctx->rewrite($input);
+		$this->assertEquals($expected, $output);
+	}
+
 }
