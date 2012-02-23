@@ -3,7 +3,7 @@
 Plugin Name: CDN Linker
 Plugin URI: https://github.com/wmark/CDN-Linker
 Description: Replaces the blog URL by another for all files under <code>wp-content</code> and <code>wp-includes</code>. That way static content can be handled by a CDN by origin pull - the origin being your blog address - or loaded from an other site.
-Version: 1.4.0
+Version: 1.5.0
 Author: W-Mark Kubacki
 Author URI: http://mark.ossdl.de/
 License: RPL for non-commercial
@@ -11,7 +11,29 @@ License: RPL for non-commercial
 
 if ( @include_once('cdn-linker-base.php') ) {
 	add_action('template_redirect', 'do_ossdl_off_ob_start');
-	// XXX: remove cached pages
+}
+if ( @include_once('cdn-linker-cache.php') ) {
+	// If something is removed from cache, it gets regenerated on the next cache-miss.
+	$caching_is_enabled = !!trim(get_option('ossdl_off_cache'));
+	if ($caching_is_enabled) {
+		foreach(array('publish_post', 'edit_post', 'delete_post', 'publish_phone')
+			as $action) {
+			add_action($action, 'ossdl_cache_remove_by_postId', 0);
+		}
+		foreach(array('trackback_post', 'pingback_post', 'comment_post', 'edit_comment', 'wp_set_comment_status')
+			as $action) {
+			add_action($action, 'ossdl_cache_remove_by_commentId', 0);
+		}
+		foreach(array('delete_comment')
+			as $action) {
+			add_action($action, 'ossdl_cache_clean', 0);
+		}
+		foreach(array('switch_theme', 'update_option_permalink_structure')
+			as $action) {
+			add_action($action, 'ossdl_cache_reset', 0);
+		}
+
+	}
 }
 
 /********** WordPress Administrative ********/

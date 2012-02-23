@@ -5,7 +5,16 @@
  * Run with: phpunit test.php
  */
 
+include('cdn-linker-cache.php');
 include('cdn-linker-base.php');
+
+class CDNCacheTest extends PHPUnit_Framework_TestCase
+{
+	public function testSchemeRemoval() {
+		$this->assertEquals(ossdl_cache_remove_scheme('test.local'), 'test.local');
+		$this->assertEquals(ossdl_cache_remove_scheme('http://test.local'), 'test.local');
+	}
+}
 
 class CDNLinkerTest extends PHPUnit_Framework_TestCase
 {
@@ -35,6 +44,7 @@ class CDNLinkerTest extends PHPUnit_Framework_TestCase
 			array('.php'),
 			false,
 			false,
+			new NullCache(),
 			false
 		);
 	}
