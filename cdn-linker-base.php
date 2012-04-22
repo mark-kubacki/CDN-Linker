@@ -93,6 +93,8 @@ class CDNLinksRewriter
 	var $www_is_optional	= false;
 	/** Boolean: will skip some matches in JS scripts if set to true */
 	var $skip_on_trailing_semicolon = false;
+	/** Boolean: only set in unit tests */
+	var $in_unit_test	= false;
 
 
 	/** Constructor. */
@@ -198,7 +200,14 @@ class CDNLinksRewriter
 		} else {
 			$regex .= '(?=[\"\')])#';
 		}
-		return preg_replace_callback($regex, array(&$this, 'rewrite_single'), $content);
+
+		$new_content = preg_replace_callback($regex, array(&$this, 'rewrite_single'), $content);
+
+		if ($this->in_unit_test) {
+			return $new_content;
+		} else {
+			return $new_content.'<!-- CDN Linker <https://github.com/wmark/CDN-Linker/tags> active -->';
+		}
 	}
 
 }

@@ -36,6 +36,7 @@ class CDNLinkerTest extends PHPUnit_Framework_TestCase
 			false,
 			false
 		);
+		$this->ctx->in_unit_test = true;
 	}
 
 	public function testNoModificationIfUrlsMatch() {
