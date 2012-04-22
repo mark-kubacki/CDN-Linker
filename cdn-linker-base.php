@@ -91,6 +91,8 @@ class CDNLinksRewriter
 	var $rootrelative	= false;
 	/** Boolean: if true, missing subdomain 'www' will still result in a match*/
 	var $www_is_optional	= false;
+	/** Boolean: will skip some matches in JS scripts if set to true */
+	var $skip_on_trailing_semicolon = false;
 
 
 	/** Constructor. */
@@ -189,8 +191,13 @@ class CDNLinksRewriter
 		// ... after that by a single dash,
 		//     (followed by a directory and some chars
 		//      or a filename (which we spot by the dot in its filename))
+		$regex .= '/(?:((?:'.$dirs.')[^\"\')]+)|([^/\"\']+\.[^/\"\')]+))';
 		// ... finally ending in an enclosing quotation mark or parentheses
-		$regex .= '/(?:((?:'.$dirs.')[^\"\')]+)|([^/\"\']+\.[^/\"\')]+))(?=[\"\')])#';
+		if ($this->skip_on_trailing_semicolon) {
+			$regex .= '(?=[\"\'][^;]|\))#';
+		} else {
+			$regex .= '(?=[\"\')])#';
+		}
 		return preg_replace_callback($regex, array(&$this, 'rewrite_single'), $content);
 	}
 
