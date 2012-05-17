@@ -53,8 +53,10 @@ function ossdl_off_options() {
 			$excludes[] = '.php';
 			update_option('ossdl_off_exclude', implode(',', $excludes));
 		}
-		update_option('ossdl_off_rootrelative', !!$_POST['ossdl_off_rootrelative']);
-		update_option('ossdl_off_www_is_optional', !!$_POST['ossdl_off_www_is_optional']);
+		$ossdl_off_rootrelative = isset($_POST['ossdl_off_rootrelative']) ? !!$_POST['ossdl_off_rootrelative'] : false;
+		$ossdl_off_www_is_optional = isset($_POST['ossdl_off_www_is_optional']) ? !!$_POST['ossdl_off_www_is_optional'] : false;
+		update_option('ossdl_off_rootrelative', $ossdl_off_rootrelative);
+		update_option('ossdl_off_www_is_optional', $ossdl_off_www_is_optional);
 	}
 	$example_cdn_uri = str_replace('http://', 'http://cdn.', str_replace('www.', '', get_option('siteurl')));
 
