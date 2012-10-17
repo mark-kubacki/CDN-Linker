@@ -67,30 +67,37 @@ class RedisCache extends ACacheStrategy
 	var $redis		= null;
 
 	function __construct() {
-		$this->redis = new redisent\Redis('localhost');
+		$this->redis = new redisent\Redis('localhost'); // XXX
 	}
 
 	public function set($key, $content) {
-		$this->redis->set($key, $content);
+		$this->redis->pipeline()
+			->set($key, $content)
+			->expire($key, 14400) // XXX
+			->uncork();
 	}
 
 	protected function expand_wildcards(array $keys) {
 		$new_keys = array();
+		$this->redis->pipeline();
 		foreach($keys as $key) {
 			if(strstr($key, '*')) {
-				$subkeys = $this->redis->keys($key);
-				foreach($subkeys as $subkey) {
-					array_push($new_keys, $subkey);
-				}
+				$this->redis->keys($key); // The results will be fetched…
 			} else {
 				array_push($new_keys, $key);
 			}
 		}
-		return $new_keys;
+		// collects all leaves
+		array_walk_recursive($this->redis->uncork(), // … here!
+			function(&$value, &$idx) use (&$new_keys) {array_push($new_keys, $value);});
+		return array_unique($new_keys);
 	}
 
 	public function remove(array $keys) {
-		call_user_func_array(array($this->redis, "del"), $this->expand_wildcards($keys));
+		$keys_to_be_removed = $this->expand_wildcards($keys);
+		$this->redis->pipeline();
+		call_user_func_array(array($this->redis, "del"), $keys_to_be_removed);
+		$this->redis->uncork();
 	}
 
 	public function empty_cache() {
