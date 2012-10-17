@@ -91,6 +91,8 @@ class CDNLinksRewriter
 	var $rootrelative	= false;
 	/** Boolean: if true, missing subdomain 'www' will still result in a match*/
 	var $www_is_optional	= false;
+	/** Boolean: HTTPS accesses deactivate rewriting */
+	var $https_deactivates_rewriting	= true;
 	/** Boolean: will skip some matches in JS scripts if set to true */
 	var $skip_on_trailing_semicolon = false;
 	/** Boolean: only set in unit tests */
@@ -98,13 +100,15 @@ class CDNLinksRewriter
 
 
 	/** Constructor. */
-	function __construct($blog_url, ICdnForItemStrategy $cdn_url, $include_dirs, array $excludes, $root_relative, $www_is_optional) {
+	function __construct($blog_url, ICdnForItemStrategy $cdn_url, $include_dirs, array $excludes, $root_relative, $www_is_optional,
+			$https_deactivates_rewriting) {
 		$this->blog_url		= $blog_url;
 		$this->cdn_url		= $cdn_url;
 		$this->include_dirs	= $include_dirs;
 		$this->excludes		= $excludes;
 		$this->rootrelative	= $root_relative;
 		$this->www_is_optional	= $www_is_optional;
+		$this->https_deactivates_rewriting = $https_deactivates_rewriting;
 	}
 
 	/**
@@ -185,6 +189,10 @@ class CDNLinksRewriter
 	 * @return String modified HTML with replaced links - will be served by the HTTP server to the requester
 	 */
 	public function rewrite(&$content) {
+		if ($this->https_deactivates_rewriting && isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == 'on') {
+			return $content;
+		}
+
 		$dirs = $this->include_dirs_to_pattern();
 		// string has to start with a quotation mark or parentheses
 		$regex = '#(?<=[(\"\'])';
@@ -228,7 +236,8 @@ class CDNLinksRewriterWordpress extends CDNLinksRewriter
 			trim(get_option('ossdl_off_include_dirs')),
 			$excludes,
 			!!trim(get_option('ossdl_off_rootrelative')),
-			!!trim(get_option('ossdl_off_www_is_optional'))
+			!!trim(get_option('ossdl_off_www_is_optional')),
+			!!trim(get_option('ossdl_off_disable_cdnuris_if_https'))
 		);
 	}
 

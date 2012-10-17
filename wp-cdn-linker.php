@@ -18,9 +18,10 @@ if ( @include_once('cdn-linker-base.php') ) {
 function ossdl_off_activate() {
 	add_option('ossdl_off_cdn_url', get_option('siteurl'));
 	add_option('ossdl_off_include_dirs', 'wp-content,wp-includes');
-	add_option('ossdl_off_exclude', '.php');
+	add_option('ossdl_off_exclude', '.php, https://');
 	add_option('ossdl_off_rootrelative', '');
 	add_option('ossdl_off_www_is_optional', '');
+	add_option('ossdl_off_disable_cdnuris_if_https', 'true');
 }
 register_activation_hook( __FILE__, 'ossdl_off_activate');
 
@@ -30,9 +31,10 @@ function ossdl_off_deactivate() {
 	delete_option('ossdl_off_exclude');
 	delete_option('ossdl_off_rootrelative');
 	delete_option('ossdl_off_www_is_optional');
+	delete_option('ossdl_off_disable_cdnuris_if_https');
 }
 // register_deactivation_hook( __FILE__, 'ossdl_off_deactivate');
-// Deactivated because: If the user activated this plugin again his previous settings would have been deleted by function.
+// Deactivated because: If the user activated this plugin again his previous settings would have been deleted by this function.
 
 /********** WordPress Interface ********/
 add_action('admin_menu', 'ossdl_off_menu');
@@ -55,8 +57,10 @@ function ossdl_off_options() {
 		}
 		$ossdl_off_rootrelative = isset($_POST['ossdl_off_rootrelative']) ? !!$_POST['ossdl_off_rootrelative'] : false;
 		$ossdl_off_www_is_optional = isset($_POST['ossdl_off_www_is_optional']) ? !!$_POST['ossdl_off_www_is_optional'] : false;
+		$ossdl_off_disable_cdnuris_if_https = isset($_POST['ossdl_off_disable_cdnuris_if_https']) ? !!$_POST['ossdl_off_disable_cdnuris_if_https'] : true;
 		update_option('ossdl_off_rootrelative', $ossdl_off_rootrelative);
 		update_option('ossdl_off_www_is_optional', $ossdl_off_www_is_optional);
+		update_option('ossdl_off_disable_cdnuris_if_https', $ossdl_off_disable_cdnuris_if_https);
 	}
 	$example_cdn_uri = str_replace('http://', 'http://cdn.', str_replace('www.', '', get_option('siteurl')));
 
@@ -96,6 +100,14 @@ function ossdl_off_options() {
 				</td>
 			</tr>
 			<tr valign="top">
+				<th scope="row"><label for="ossdl_off_disable_cdnuris_if_https">HTTPS without CDN</label></th>
+				<td>
+					<input type="checkbox" name="ossdl_off_disable_cdnuris_if_https" <?php echo(!!get_option('"ossdl_off_disable_cdnuris_if_https"') ? 'checked="1" ' : '') ?>value="true" class="regular-text code" />
+					<span class="description">Skips linking to your CDN if the page has been visited using HTTPS. This option will not affect caching.
+					If in doubt say 'yes'.</span>
+				</td>
+			</tr>
+			<tr valign="top">
 				<th scope="row"><label for="ossdl_off_include_dirs">include dirs</label></th>
 				<td>
 					<input type="text" name="ossdl_off_include_dirs" value="<?php echo(get_option('ossdl_off_include_dirs')); ?>" size="64" class="regular-text code" />
@@ -106,7 +118,7 @@ function ossdl_off_options() {
 				<th scope="row"><label for="ossdl_off_exclude">exclude if substring</label></th>
 				<td>
 					<input type="text" name="ossdl_off_exclude" value="<?php echo(get_option('ossdl_off_exclude')); ?>" size="64" class="regular-text code" />
-					<span class="description">Excludes something from being rewritten if one of the above strings is found in the match. Use a comma as the delimiter. E.g. <code>.php, .flv, .do</code>, always include <code>.php</code> (default and enforced if missing).</span>
+					<span class="description">Excludes something from being rewritten if one of the above strings is found in the match. Use a comma as the delimiter. E.g. <code>.php, .flv, .do</code>, always include <code>.php, https://</code>, which is the default. (Will be <code>.php</code> if left empty.)</span>
 				</td>
 			</tr>
 		</tbody></table>

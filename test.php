@@ -34,7 +34,8 @@ class CDNLinkerTest extends PHPUnit_Framework_TestCase
 			'wp-content,wp-includes',
 			array('.php'),
 			false,
-			false
+			false,
+			true
 		);
 		$this->ctx->in_unit_test = true;
 	}
@@ -128,6 +129,22 @@ class CDNLinkerTest extends PHPUnit_Framework_TestCase
 				}
 			}
 		}
+	}
+
+	public function testDisableCDNURISifHTTPS() {
+		$this->ctx->https_deactivates_rewriting = true;
+
+		// request without HTTPS
+		$input = '<img src="http://test.local/favicon.ico" />';
+		$expected = '<img src="http://cdn.test.local/favicon.ico" />';
+		$output = $this->ctx->rewrite($input);
+		$this->assertEquals($expected, $output);
+
+		// request using HTTPS
+		$_SERVER["HTTPS"] = 'on';
+		$expected = '<img src="http://test.local/favicon.ico" />';
+		$output = $this->ctx->rewrite($input);
+		$this->assertEquals($expected, $output);
 	}
 
 	public function testMultipleCDNs() {
