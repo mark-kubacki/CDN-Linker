@@ -4,8 +4,8 @@ CDN Linker - Wordpress Plugin
 :Info: See `github <http://github.com/wmark/CDN-Linker>`_ for the latest source.
 :Author: W-Mark Kubacki <wmark@hurrikane.de>
 :Tags: CDN,links,cloudfront,simplecdn,media,performance,distribution,accelerator,content,speed,cloud
-:Requires at least: 2.7
-:Tested up to: 3.1.2
+:Minimum required: Wordpress 2.7
+:Tested up to: Wordpress 3.4.2
 
 Rewrites links to static files to your own CDN network.
 
@@ -81,11 +81,6 @@ What about Amazon's S3?
   I've written a script for this, too, so it is just a matter of running it. It is linked on the bottom of my blog post about
   `copying files to S3 <http://mark.ossdl.de/2009/09/how-to-copy-your-wordpress-files-to-cloudfront-efficiently/>`_.
 
-What other plugins do you recommend?
-  Now that you can offload all the files such as images, music or CSS, you should serve your blog posts as static files to
-  decrease load on your server. I recommend SuperCache-Plus_ as it will maintain, update and create that static files from
-  dynamic content for you. The off-linker is compatible.
-
 Alternatives?
   The experts at `Arcostream` currently develop (or have it ready by now) a plugin which enables you to set up a CDN at their's
   with one click or two. Without any configuration, everything is automatic. Please google their licensed flavour of this plugin. ;-)
@@ -99,5 +94,4 @@ I discovered a bug!
 
 .. _ob_start:        http://us2.php.net/manual/en/function.ob-start.php
 .. _Mark:            http://mark.ossdl.de/
-.. _SuperCache-Plus: http://murmatrons.armadillo.homeip.net/features/experimental-eaccelerator-wp-super-cache
 __ Mark_
