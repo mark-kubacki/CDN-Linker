@@ -21,7 +21,7 @@ function ossdl_off_activate() {
 	add_option('ossdl_off_exclude', '.php, https://');
 	add_option('ossdl_off_rootrelative', '');
 	add_option('ossdl_off_www_is_optional', '');
-	add_option('ossdl_off_disable_cdnuris_if_https', 'true');
+	add_option('ossdl_off_disable_cdnuris_if_https', '1');
 }
 register_activation_hook( __FILE__, 'ossdl_off_activate');
 
@@ -57,7 +57,7 @@ function ossdl_off_options() {
 		}
 		$ossdl_off_rootrelative = isset($_POST['ossdl_off_rootrelative']) ? !!$_POST['ossdl_off_rootrelative'] : false;
 		$ossdl_off_www_is_optional = isset($_POST['ossdl_off_www_is_optional']) ? !!$_POST['ossdl_off_www_is_optional'] : false;
-		$ossdl_off_disable_cdnuris_if_https = isset($_POST['ossdl_off_disable_cdnuris_if_https']) ? !!$_POST['ossdl_off_disable_cdnuris_if_https'] : true;
+		$ossdl_off_disable_cdnuris_if_https = isset($_POST['ossdl_off_disable_cdnuris_if_https']) ? !!$_POST['ossdl_off_disable_cdnuris_if_https'] : false;
 		update_option('ossdl_off_rootrelative', $ossdl_off_rootrelative);
 		update_option('ossdl_off_www_is_optional', $ossdl_off_www_is_optional);
 		update_option('ossdl_off_disable_cdnuris_if_https', $ossdl_off_disable_cdnuris_if_https);
@@ -102,7 +102,7 @@ function ossdl_off_options() {
 			<tr valign="top">
 				<th scope="row"><label for="ossdl_off_disable_cdnuris_if_https">HTTPS without CDN</label></th>
 				<td>
-					<input type="checkbox" name="ossdl_off_disable_cdnuris_if_https" <?php echo(!!get_option('"ossdl_off_disable_cdnuris_if_https"') ? 'checked="1" ' : '') ?>value="true" class="regular-text code" />
+					<input type="checkbox" name="ossdl_off_disable_cdnuris_if_https" <?php echo(!!get_option('ossdl_off_disable_cdnuris_if_https') ? 'checked="1" ' : '') ?>value="true" class="regular-text code" />
 					<span class="description">Skips linking to your CDN if the page has been visited using HTTPS. This option will not affect caching.
 					If in doubt say 'yes'.</span>
 				</td>
