@@ -119,9 +119,11 @@ class CDNLinksRewriter
 	 */
 	protected function exclude_single(&$match) {
 		foreach ($this->excludes as $badword) {
-			if (stristr($match, $badword) != false) {
-				return true;
-			}
+          if ($badword) {
+            if (stristr($match, $badword) != false) {
+              return true;
+            }
+          }
 		}
 		return false;
 	}
