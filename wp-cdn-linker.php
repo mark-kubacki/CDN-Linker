@@ -62,14 +62,23 @@ function ossdl_off_options() {
 		update_option('ossdl_off_www_is_optional', $ossdl_off_www_is_optional);
 		update_option('ossdl_off_disable_cdnuris_if_https', $ossdl_off_disable_cdnuris_if_https);
 	}
-	$example_cdn_uri = str_replace('http://', 'http://cdn.', str_replace('www.', '', get_option('siteurl')));
+
+	$example_file_rr = '/wp-includes/images/rss.png';
+	if (get_option('ossdl_off_cdn_url') == get_option('siteurl')) {
+		$example_cdn_uri = str_replace('http://', 'http://cdn.', str_replace('www.', '', get_option('siteurl')))
+				. $example_file_rr;
+	} else {
+		$cdn_strategy = ossdl_off_cdn_strategy_for(trim(get_option('ossdl_off_cdn_url')));
+		$example_cdn_uri = $cdn_strategy->get_for(get_option('siteurl') . $example_file_rr)
+				. $example_file_rr;
+	}
 
 	?><div class="wrap">
 		<h2>CDN Linker</h2>
 		<p>Many Wordpress plugins misbehave when linking to their JS or CSS files, and yet there is no filter to let your old posts point to a statics' site or CDN for images.
 		Therefore this plugin replaces at any links into <code>wp-content</code> and <code>wp-includes</code> directories (except for PHP files) the <code>blog_url</code> by the URL you provide below.
 		That way you can either copy all the static content to a dedicated host or mirror the files at a CDN by <a href="http://knowledgelayer.softlayer.com/questions/365/How+does+Origin+Pull+work%3F" target="_blank">origin pull</a>.</p>
-		<p><strong style="color: red">WARNING:</strong> Test some static urls e.g., <code><?php echo(get_option('ossdl_off_cdn_url') == get_option('siteurl') ? $example_cdn_uri : get_option('ossdl_off_cdn_url')); ?>/wp-includes/js/prototype.js</code> to ensure your CDN service is fully working before saving changes.</p>
+		<p><strong style="color: red">WARNING:</strong> Test some static urls e.g., <code><a href="<?php echo($example_cdn_uri); ?>" target="_blank"><?php echo($example_cdn_uri); ?></a></code> to ensure your CDN service is fully working before saving changes.</p>
 		<p><form method="post" action="">
 		<table class="form-table"><tbod>
 			<tr valign="top">
