@@ -69,8 +69,8 @@ function ossdl_off_options() {
 				. $example_file_rr;
 	} else {
 		$cdn_strategy = ossdl_off_cdn_strategy_for(trim(get_option('ossdl_off_cdn_url')));
-		$example_cdn_uri = $cdn_strategy->get_for(get_option('siteurl') . $example_file_rr)
-				. $example_file_rr;
+		$example_uri = get_option('siteurl') . $example_file_rr;
+		$example_cdn_uri = $cdn_strategy->get_for($example_uri) . $example_file_rr;
 	}
 
 	?><div class="wrap">
