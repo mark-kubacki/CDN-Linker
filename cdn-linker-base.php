@@ -219,7 +219,7 @@ class CDNLinksRewriter
 	 * @return String HTML
 	 */
 	public function cache(&$content) {
-		if($this->cache_content && $this->cache->cache_this_request()) {
+		if($this->cache_content && $this->cache->cache_this_request() && strlen($content) > 120) { // XXX: make 120 configurable
 			$key = $this->cache->generate_key();
 			$this->cache->set($key, $content.'<!-- served from cache using CDN Linker <https://github.com/wmark/CDN-Linker/tags> -->');
 			return $content.'<!-- CDN Linker <https://github.com/wmark/CDN-Linker/tags> page cache active -->';
