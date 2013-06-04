@@ -40,7 +40,7 @@ function ossdl_off_deactivate() {
 add_action('admin_menu', 'ossdl_off_menu');
 
 function ossdl_off_menu() {
-	add_options_page('CDN Linker', 'CDN Linker', manage_options, __FILE__, 'ossdl_off_options');
+	add_options_page('CDN Linker', 'CDN Linker', 'manage_options', __FILE__, 'ossdl_off_options');
 }
 
 function ossdl_off_options() {
