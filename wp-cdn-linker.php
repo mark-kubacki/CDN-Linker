@@ -25,22 +25,25 @@ function ossdl_off_activate() {
 }
 register_activation_hook( __FILE__, 'ossdl_off_activate');
 
-function ossdl_off_deactivate() {
-	delete_option('ossdl_off_cdn_url');
-	delete_option('ossdl_off_include_dirs');
-	delete_option('ossdl_off_exclude');
-	delete_option('ossdl_off_rootrelative');
-	delete_option('ossdl_off_www_is_optional');
-	delete_option('ossdl_off_disable_cdnuris_if_https');
-}
-// register_deactivation_hook( __FILE__, 'ossdl_off_deactivate');
-// Deactivated because: If the user activated this plugin again his previous settings would have been deleted by this function.
+// uninstall hook in uninstall.php
 
 /********** WordPress Interface ********/
 add_action('admin_menu', 'ossdl_off_menu');
+add_filter('plugin_action_links', 'ossdl_off_plugin_actions', 10, 2 );
 
 function ossdl_off_menu() {
 	add_options_page('CDN Linker', 'CDN Linker', 8, __FILE__, 'ossdl_off_options');
+}
+
+function ossdl_off_plugin_actions($links, $file) {
+	static $this_plugin;
+	if( !$this_plugin ) $this_plugin = plugin_basename(__FILE__);
+
+	if( $file == $this_plugin && is_plugin_active($file)){
+		$settings_link = '<a href="options-general.php?page='. $this_plugin .'">' . __('Settings') . '</a>';
+		array_unshift( $links, $settings_link ); // before other links
+	}
+	return $links;
 }
 
 function ossdl_off_options() {
