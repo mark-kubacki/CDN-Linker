@@ -25,22 +25,25 @@ function ossdl_off_activate() {
 }
 register_activation_hook( __FILE__, 'ossdl_off_activate');
 
-function ossdl_off_deactivate() {
-	delete_option('ossdl_off_cdn_url');
-	delete_option('ossdl_off_include_dirs');
-	delete_option('ossdl_off_exclude');
-	delete_option('ossdl_off_rootrelative');
-	delete_option('ossdl_off_www_is_optional');
-	delete_option('ossdl_off_disable_cdnuris_if_https');
-}
-// register_deactivation_hook( __FILE__, 'ossdl_off_deactivate');
-// Deactivated because: If the user activated this plugin again his previous settings would have been deleted by this function.
+// uninstall hook in uninstall.php
 
 /********** WordPress Interface ********/
 add_action('admin_menu', 'ossdl_off_menu');
+add_filter('plugin_action_links', 'ossdl_off_plugin_actions', 10, 2 );
 
 function ossdl_off_menu() {
 	add_options_page('CDN Linker', 'CDN Linker', 8, __FILE__, 'ossdl_off_options');
+}
+
+function ossdl_off_plugin_actions($links, $file) {
+	static $this_plugin;
+	if( !$this_plugin ) $this_plugin = plugin_basename(__FILE__);
+
+	if( $file == $this_plugin && is_plugin_active($file)){
+		$settings_link = '<a href="options-general.php?page='. $this_plugin .'">' . __('Settings') . '</a>';
+		array_unshift( $links, $settings_link ); // before other links
+	}
+	return $links;
 }
 
 function ossdl_off_options() {
@@ -79,8 +82,8 @@ function ossdl_off_options() {
 		Therefore this plugin replaces at any links into <code>wp-content</code> and <code>wp-includes</code> directories (except for PHP files) the <code>blog_url</code> by the URL you provide below.
 		That way you can either copy all the static content to a dedicated host or mirror the files at a CDN by <a href="http://knowledgelayer.softlayer.com/questions/365/How+does+Origin+Pull+work%3F" target="_blank">origin pull</a>.</p>
 		<p><strong style="color: red">WARNING:</strong> Test some static urls e.g., <code><a href="<?php echo($example_cdn_uri); ?>" target="_blank"><?php echo($example_cdn_uri); ?></a></code> to ensure your CDN service is fully working before saving changes.</p>
-		<p><form method="post" action="">
-		<table class="form-table"><tbod>
+		<form method="post" action="">
+		<table class="form-table"><tbody>
 			<tr valign="top">
 				<th scope="row"><label for="ossdl_off_cdn_url">CDN URL</label></th>
 				<td>
@@ -96,14 +99,14 @@ function ossdl_off_options() {
 			<tr valign="top">
 				<th scope="row"><label for="ossdl_off_rootrelative">rewrite root-relative refs</label></th>
 				<td>
-					<input type="checkbox" name="ossdl_off_rootrelative" <?php echo(!!get_option('ossdl_off_rootrelative') ? 'checked="1" ' : '') ?>value="true" class="regular-text code" />
+					<input type="checkbox" name="ossdl_off_rootrelative" <?php echo(!!get_option('ossdl_off_rootrelative') ? 'checked="1" ' : '') ?>value="true" />
 					<span class="description">Check this if you want to have links like <code><em>/</em>wp-content/xyz.png</code> rewritten - i.e. without your blog's domain as prefix.</span>
 				</td>
 			</tr>
 			<tr valign="top">
 				<th scope="row"><label for="ossdl_off_www_is_optional">subdomain 'www' is optional</label></th>
 				<td>
-					<input type="checkbox" name="ossdl_off_www_is_optional" <?php echo(!!get_option('ossdl_off_www_is_optional') ? 'checked="1" ' : '') ?>value="true" class="regular-text code" />
+					<input type="checkbox" name="ossdl_off_www_is_optional" <?php echo(!!get_option('ossdl_off_www_is_optional') ? 'checked="1" ' : '') ?>value="true" />
 					<span class="description">Check this if your blog can be accessed without a 'www' in front of its domain name. If unchecked, links with missing 'www' won't be modified.
 					Safe to say 'yes' here.</span>
 				</td>
@@ -111,7 +114,7 @@ function ossdl_off_options() {
 			<tr valign="top">
 				<th scope="row"><label for="ossdl_off_disable_cdnuris_if_https">HTTPS without CDN</label></th>
 				<td>
-					<input type="checkbox" name="ossdl_off_disable_cdnuris_if_https" <?php echo(!!get_option('ossdl_off_disable_cdnuris_if_https') ? 'checked="1" ' : '') ?>value="true" class="regular-text code" />
+					<input type="checkbox" name="ossdl_off_disable_cdnuris_if_https" <?php echo(!!get_option('ossdl_off_disable_cdnuris_if_https') ? 'checked="1" ' : '') ?>value="true" />
 					<span class="description">Skips linking to your CDN if the page has been visited using HTTPS. This option will not affect caching.
 					If in doubt say 'yes'.</span>
 				</td>
@@ -133,6 +136,6 @@ function ossdl_off_options() {
 		</tbody></table>
 		<input type="hidden" name="action" value="update_ossdl_off" />
 		<p class="submit"><input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" /></p>
-		</form></p>
+		</form>
 	</div><?php
 }
