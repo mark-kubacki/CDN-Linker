@@ -44,7 +44,7 @@ function ossdl_off_menu() {
 }
 
 function ossdl_off_options() {
-	if ( isset($_POST['action']) && ( $_POST['action'] == 'update_ossdl_off' )){
+	if (isset($_POST['ossdl-nonce']) && wp_verify_nonce($_POST['ossdl-nonce'], 'save-options')) {
 		update_option('ossdl_off_cdn_url', $_POST['ossdl_off_cdn_url']);
 		update_option('ossdl_off_include_dirs', $_POST['ossdl_off_include_dirs'] == '' ? 'wp-content,wp-includes' : $_POST['ossdl_off_include_dirs']);
 		if(strstr(get_option('ossdl_off_exclude'), '.php')) {
@@ -131,7 +131,7 @@ function ossdl_off_options() {
 				</td>
 			</tr>
 		</tbody></table>
-		<input type="hidden" name="action" value="update_ossdl_off" />
+		<?php wp_nonce_field('save-options', 'ossdl-nonce'); ?>
 		<p class="submit"><input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" /></p>
 		</form></p>
 	</div><?php
