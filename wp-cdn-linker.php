@@ -47,7 +47,7 @@ function ossdl_off_options() {
 	if (!empty($_POST) && check_admin_referer('save-options', 'ossdl-nonce')) {
 		update_option('ossdl_off_cdn_url', $_POST['ossdl_off_cdn_url']);
 		update_option('ossdl_off_include_dirs', $_POST['ossdl_off_include_dirs'] == '' ? 'wp-content,wp-includes' : $_POST['ossdl_off_include_dirs']);
-		if(strstr(get_option('ossdl_off_exclude'), '.php')) {
+		if(strstr($_POST['ossdl_off_exclude'], '.php')) {
 			update_option('ossdl_off_exclude', $_POST['ossdl_off_exclude']);
 		} else {
 			// this forces '.php' being part of the list
