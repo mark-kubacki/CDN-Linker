@@ -44,7 +44,7 @@ function ossdl_off_menu() {
 }
 
 function ossdl_off_options() {
-	if (isset($_POST['ossdl-nonce']) && wp_verify_nonce($_POST['ossdl-nonce'], 'save-options')) {
+	if (!empty($_POST) && check_admin_referer('save-options', 'ossdl-nonce')) {
 		update_option('ossdl_off_cdn_url', $_POST['ossdl_off_cdn_url']);
 		update_option('ossdl_off_include_dirs', $_POST['ossdl_off_include_dirs'] == '' ? 'wp-content,wp-includes' : $_POST['ossdl_off_include_dirs']);
 		if(strstr(get_option('ossdl_off_exclude'), '.php')) {
