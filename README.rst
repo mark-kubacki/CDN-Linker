@@ -4,8 +4,8 @@ CDN Linker - Wordpress Plugin
 :Info: See `github <http://github.com/wmark/CDN-Linker>`_ for the latest source.
 :Author: W-Mark Kubacki <wmark@hurrikane.de>
 :Tags: CDN,links,cloudfront,simplecdn,media,performance,distribution,accelerator,content,speed,cloud
-:Requires at least: 2.7
-:Tested up to: 3.5.1
+:min. WP: 2.7
+:Tested up to: 3.9
 
 Rewrites links to static files to your own CDN network.
 
