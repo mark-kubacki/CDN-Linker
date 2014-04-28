@@ -94,7 +94,7 @@ function ossdl_off_options() {
 			<tr valign="top">
 				<th scope="row"><label for="ossdl_off_cdn_url">CDN URL</label></th>
 				<td>
-					<input type="text" name="ossdl_off_cdn_url" value="<?php echo(get_option('ossdl_off_cdn_url')); ?>" size="64" class="regular-text code" />
+					<input type="text" name="ossdl_off_cdn_url" value="<?php echo(esc_attr(get_option('ossdl_off_cdn_url'))); ?>" size="64" class="regular-text code" />
 					<span class="description">The new URL to be used in place of <?php echo(get_option('siteurl')); ?> for rewriting. No trailing <code>/</code> please. E.&thinsp;g. <code><?php echo($example_cdn_uri); ?></code>.
 					&mdash;
 					You can use <code>%4%</code> (a number between 1 and 9, surrounded by percent signs) to use that many hostname variations.
@@ -130,7 +130,7 @@ function ossdl_off_options() {
 			<tr valign="top">
 				<th scope="row"><label for="ossdl_off_include_dirs">include dirs</label></th>
 				<td>
-					<input type="text" name="ossdl_off_include_dirs" value="<?php echo(get_option('ossdl_off_include_dirs')); ?>" size="64" class="regular-text code" />
+					<input type="text" name="ossdl_off_include_dirs" value="<?php echo(esc_attr(get_option('ossdl_off_include_dirs'))); ?>" size="64" class="regular-text code" />
 					<span class="description">Directories to include in static file matching.
 					Use a comma as delimiter. Default is <code>wp-content, wp-includes</code>, which will be enforced if this field is left empty.</span>
 				</td>
@@ -138,7 +138,7 @@ function ossdl_off_options() {
 			<tr valign="top">
 				<th scope="row"><label for="ossdl_off_exclude">exclude if substring</label></th>
 				<td>
-					<input type="text" name="ossdl_off_exclude" value="<?php echo(get_option('ossdl_off_exclude')); ?>" size="64" class="regular-text code" />
+					<input type="text" name="ossdl_off_exclude" value="<?php echo(esc_attr(get_option('ossdl_off_exclude'))); ?>" size="64" class="regular-text code" />
 					<span class="description">Excludes something from being rewritten if one of the above strings is found in the match.
 					Use a comma as delimiter. E.&thinsp;g. <code>.php, .flv, .do</code>.
 					Always include <code>.php</code>, which is the default. (Will be set to <code>.php</code> if left empty.)</span>
