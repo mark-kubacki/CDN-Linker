@@ -25,8 +25,6 @@ function ossdl_off_activate() {
 }
 register_activation_hook( __FILE__, 'ossdl_off_activate');
 
-// uninstall hook in uninstall.php
-
 /********** WordPress Interface ********/
 add_action('admin_menu', 'ossdl_off_menu');
 add_filter('plugin_action_links', 'ossdl_off_plugin_actions', 10, 2 );
