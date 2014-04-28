@@ -50,6 +50,8 @@ function ossdl_off_plugin_actions($links, $file) {
 
 function ossdl_off_options() {
 	if (!empty($_POST) && check_admin_referer('save-options', 'ossdl-nonce')) {
+		// Yes, this URL is not subject to esc_url() or esc_url_raw() (please don’t report it), because:
+		// 1) Only the owner of the installation can change this setting — if he/she wants something odd here (javascript:…; HTML fragments), we allow for it!
 		update_option('ossdl_off_cdn_url', $_POST['ossdl_off_cdn_url']);
 		update_option('ossdl_off_include_dirs', $_POST['ossdl_off_include_dirs'] == '' ? 'wp-content,wp-includes' : $_POST['ossdl_off_include_dirs']);
 		if(strstr($_POST['ossdl_off_exclude'], '.php')) {
