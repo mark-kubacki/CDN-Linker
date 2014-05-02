@@ -211,11 +211,8 @@ class CDNLinksRewriter
 
 		$new_content = preg_replace_callback($regex, array(&$this, 'rewrite_single'), $content);
 
-		if ($this->in_unit_test) {
-			return $new_content;
-		} else {
-			return $new_content.'<!-- CDN Linker <https://github.com/wmark/CDN-Linker/tags> active -->';
-		}
+		return $new_content;
+		
 	}
 
 }
