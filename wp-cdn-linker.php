@@ -9,8 +9,10 @@ Author URI: http://mark.ossdl.de/
 License: RPL 1.5, for Personal Use
 */
 
+namespace blitznote\wp;
+
 if ( @include_once('cdn-linker-base.php') ) {
-	add_action('template_redirect', 'do_ossdl_off_ob_start');
+	add_action('template_redirect', 'blitznote\wp\cdn\do_ossdl_off_ob_start');
 }
 
 /********** WordPress Administrative ********/
@@ -23,14 +25,14 @@ function ossdl_off_activate() {
 	add_option('ossdl_off_www_is_optional', '');
 	add_option('ossdl_off_disable_cdnuris_if_https', '1');
 }
-register_activation_hook( __FILE__, 'ossdl_off_activate');
+register_activation_hook( __FILE__, 'blitznote\wp\ossdl_off_activate');
 
 /********** WordPress Interface ********/
-add_action('admin_menu', 'ossdl_off_menu');
-add_filter('plugin_action_links', 'ossdl_off_plugin_actions', 10, 2 );
+add_action('admin_menu', 'blitznote\wp\ossdl_off_menu');
+add_filter('plugin_action_links', 'blitznote\wp\ossdl_off_plugin_actions', 10, 2);
 
 function ossdl_off_menu() {
-	add_options_page('CDN Linker', 'CDN Linker', 'manage_options', __FILE__, 'ossdl_off_options');
+	add_options_page('CDN Linker', 'CDN Linker', 'manage_options', __FILE__, 'blitznote\wp\ossdl_off_options');
 }
 
 function ossdl_off_plugin_actions($links, $file) {
@@ -74,7 +76,7 @@ function ossdl_off_options() {
 		$example_cdn_uri = str_replace('http://', 'http://cdn.', str_replace('www.', '', get_option('siteurl')))
 				. $example_file_rr;
 	} else {
-		$cdn_strategy = ossdl_off_cdn_strategy_for(trim(get_option('ossdl_off_cdn_url')));
+		$cdn_strategy = cdn\ossdl_off_cdn_strategy_for(trim(get_option('ossdl_off_cdn_url')));
 		$example_uri = get_option('siteurl') . $example_file_rr;
 		$example_cdn_uri = $cdn_strategy->get_for($example_uri) . $example_file_rr;
 	}

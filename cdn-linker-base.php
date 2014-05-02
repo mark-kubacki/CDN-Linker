@@ -1,4 +1,7 @@
 <?php
+
+namespace blitznote\wp\cdn;
+
 /**
  * Strategy for creating CDN URIs.
  */
