@@ -5,7 +5,7 @@ namespace blitznote\wp\cdn;
 /**
  * Strategy for creating CDN URIs.
  */
-interface ICdnForItemStrategy
+interface Target_URL_Strategy
 {
 	/**
 	 * Gets the right CDN URL for the given item.
@@ -13,14 +13,14 @@ interface ICdnForItemStrategy
 	 * By modifying or overwriting this method you could, for example,
 	 * have images loaded from CDN 1 and videos from CDN 2.
 	 *
-	 * @param String $item will either be something like 'http://test.local/xyz/zdf.ext' or '/xyz/zdf.ext'
+	 * @param String $url will either be something like 'http://test.local/xyz/zdf.ext' or '/xyz/zdf.ext'
 	 * @return String contains the CDN url - e.g. 'http://cdn.test.local'
 	 */
-	public function get_for(&$item);
+	public function for_source(&$url);
 
 }
 
-class OneCdnForAllStrategy implements ICdnForItemStrategy
+class Target_single_host implements Target_URL_Strategy
 {
 	/** String: URL of the CDN domain */
 	var $cdn_url		= null;
@@ -29,13 +29,13 @@ class OneCdnForAllStrategy implements ICdnForItemStrategy
 		$this->cdn_url = $cdn_url;
 	}
 
-	public function get_for(&$item) {
+	public function for_source(&$url) {
 		return $this->cdn_url;
 	}
 
 }
 
-class MultipleCdnsDeterministic implements ICdnForItemStrategy
+class Target_multiple_hosts implements Target_URL_Strategy
 {
 	/**
 	 * String: URL with pattern %d% for the CDN domains.
@@ -45,7 +45,7 @@ class MultipleCdnsDeterministic implements ICdnForItemStrategy
 	/** Number of variations. Derived from the above variable. */
 	var $variations		= 0;
 	/** Fragment, to speed up replacings. */
-	var $fragment		= null;
+	protected $fragment	= null;
 
 	function __construct($cdn_pattern) {
 		preg_match('/%(\d)%/', $cdn_pattern, $m);
@@ -54,21 +54,21 @@ class MultipleCdnsDeterministic implements ICdnForItemStrategy
 		$this->fragment = $m[0];
 	}
 
-	public function get_for(&$item) {
-		$n = ( hexdec(substr(md5($item), 0, 1)) % $this->variations ) + 1;
+	public function for_source(&$url) {
+		$n = ( hexdec(substr(md5($url), 0, 1)) % $this->variations ) + 1;
 		return str_replace($this->fragment, $n, $this->cdn_pattern);
 	}
 
 }
 
 /**
- * Gets an implementation of ICdnForItemStrategy.
+ * Gets an implementation of Target_URL_Strategy.
  */
-function ossdl_off_cdn_strategy_for($pattern) {
+function target_url_strategy_for($pattern) {
 	if (preg_match('/%(\d)%/', $pattern)) {
-		return new MultipleCdnsDeterministic($pattern);
+		return new Target_multiple_hosts($pattern);
 	} else {
-		return new OneCdnForAllStrategy($pattern);
+		return new Target_single_host($pattern);
 	}
 }
 
@@ -78,14 +78,14 @@ function ossdl_off_cdn_strategy_for($pattern) {
  * 'rewrite' gets the raw HTML as input and returns the final result.
  * It finds all links and runs them through 'rewrite_singe', which prepends the CDN domain.
  *
- * 'CDNLinksRewriter' contains no WP related function calls and can thus be used in testing or in other software.
+ * 'URI_changer' contains no WP related function calls and can thus be used in testing or in other software.
  */
-class CDNLinksRewriter
+class URI_changer
 {
 	/** String: the blog's URL ( get_option('siteurl') ) */
 	var $blog_url		= null;
-	/** ICdnForItemStrategy: results in URL of a CDN domain */
-	var $cdn_url		= null;
+	/** Target_URL_Strategy: results in URL of a CDN domain */
+	var $get_target_url	= null;
 	/** String: directories to include in static file matching, comma-delimited list */
 	var $include_dirs	= null;
 	/** Array: strings which indicate that a given element should not be rewritten (i.e., ".php") */
@@ -103,10 +103,11 @@ class CDNLinksRewriter
 
 
 	/** Constructor. */
-	function __construct($blog_url, ICdnForItemStrategy $cdn_url, $include_dirs, array $excludes, $root_relative, $www_is_optional,
+	function __construct($blog_url, Target_URL_Strategy $get_target_url, $include_dirs,
+			array $excludes, $root_relative, $www_is_optional,
 			$https_deactivates_rewriting) {
 		$this->blog_url		= $blog_url;
-		$this->cdn_url		= $cdn_url;
+		$this->get_target_url	= $get_target_url;
 		$this->include_dirs	= $include_dirs;
 		$this->excludes		= $excludes;
 		$this->rootrelative	= $root_relative;
@@ -144,9 +145,9 @@ class CDNLinksRewriter
 				$blog_url = str_replace('//www.', '//', $blog_url);
 			}
 			if (!$this->rootrelative || strstr($match[0], $blog_url)) {
-				return str_replace($blog_url, $this->cdn_url->get_for($match[0]), $match[0]);
+				return str_replace($blog_url, $this->get_target_url->for_source($match[0]), $match[0]);
 			} else { // obviously $this->rootrelative is true and we got a root-relative link - else that case won't happen
-				return $this->cdn_url->get_for($match[0]) . $match[0];
+				return $this->get_target_url->for_source($match[0]) . $match[0];
 			}
 		}
 	}
@@ -223,7 +224,7 @@ class CDNLinksRewriter
 /**
  * The rewrite logic with calls to Wordpress.
  */
-class CDNLinksRewriterWordpress extends CDNLinksRewriter
+class URI_changer_for_wordpress extends URI_changer
 {
 	/** Initializes all options calling Wordpress functions. */
 	function __construct() {
@@ -232,7 +233,7 @@ class CDNLinksRewriterWordpress extends CDNLinksRewriter
 
 		parent::__construct(
 			get_option('siteurl'),
-			ossdl_off_cdn_strategy_for(trim(get_option('ossdl_off_cdn_url'))),
+			target_url_strategy_for(trim(get_option('ossdl_off_cdn_url'))),
 			trim(get_option('ossdl_off_include_dirs')),
 			$excludes,
 			!!trim(get_option('ossdl_off_rootrelative')),
@@ -259,6 +260,6 @@ class CDNLinksRewriterWordpress extends CDNLinksRewriter
  * It is called by Wordpress.
  */
 function do_ossdl_off_ob_start() {
-	$rewriter = new CDNLinksRewriterWordpress();
+	$rewriter = new URI_changer_for_wordpress();
 	$rewriter->register_as_output_buffer();
 }

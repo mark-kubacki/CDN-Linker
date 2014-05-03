@@ -76,9 +76,9 @@ function ossdl_off_options() {
 		$example_cdn_uri = str_replace('http://', 'http://cdn.', str_replace('www.', '', get_option('siteurl')))
 				. $example_file_rr;
 	} else {
-		$cdn_strategy = cdn\ossdl_off_cdn_strategy_for(trim(get_option('ossdl_off_cdn_url')));
 		$example_uri = get_option('siteurl') . $example_file_rr;
-		$example_cdn_uri = $cdn_strategy->get_for($example_uri) . $example_file_rr;
+		$get_target_url = cdn\target_url_strategy_for(trim(get_option('ossdl_off_cdn_url')));
+		$example_cdn_uri = $get_target_url->for_source($example_uri) . $example_file_rr;
 	}
 
 	?><div class="wrap" xml:lang="en">
