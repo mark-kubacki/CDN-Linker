@@ -217,44 +217,23 @@ class URI_changer
 }
 
 /**
- * The rewrite logic with calls to Wordpress.
- */
-class URI_changer_for_wordpress extends URI_changer
-{
-	/** Initializes all options calling Wordpress functions. */
-	function __construct() {
-		$excl_tmp = trim(get_option('ossdl_off_exclude'));
-		$excludes = array_map('trim', explode(',', $excl_tmp));
-
-		parent::__construct(
-			get_option('siteurl'),
-			target_url_strategy_for(trim(get_option('ossdl_off_cdn_url'))),
-			trim(get_option('ossdl_off_include_dirs')),
-			$excludes,
-			!!trim(get_option('ossdl_off_rootrelative')),
-			!!trim(get_option('ossdl_off_www_is_optional')),
-			!!trim(get_option('ossdl_off_disable_cdnuris_if_https'))
-		);
-	}
-
-	/**
-	 * Registers the output buffer, if needed.
-	 *
-	 * This function is called by Wordpress if the plugin was enabled.
-	 */
-	public function register_as_output_buffer() {
-		if ($this->blog_url != trim(get_option('ossdl_off_cdn_url'))) {
-			ob_start(array(&$this, 'rewrite'));
-		}
-	}
-
-}
-
-/**
- * This function actually registers the rewriter.
- * It is called by Wordpress.
+ * This is called by Wordpress.
  */
 function register_as_output_buffer_handler() {
-	$rewriter = new URI_changer_for_wordpress();
-	$rewriter->register_as_output_buffer();
+	if (get_option('siteurl') == trim(get_option('ossdl_off_cdn_url'))) {
+		return;
+	}
+
+	$excludes = array_map('trim', explode(',', get_option('ossdl_off_exclude')));
+	$rewriter = new URI_changer(
+		get_option('siteurl'),
+		target_url_strategy_for(trim(get_option('ossdl_off_cdn_url'))),
+		trim(get_option('ossdl_off_include_dirs')),
+		$excludes,
+		!!trim(get_option('ossdl_off_rootrelative')),
+		!!trim(get_option('ossdl_off_www_is_optional')),
+		!!trim(get_option('ossdl_off_disable_cdnuris_if_https'))
+	);
+
+	ob_start(array(&$rewriter, 'rewrite'));
 }
