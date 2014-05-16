@@ -67,9 +67,8 @@ class Target_multiple_hosts implements Target_URL_Strategy
 function target_url_strategy_for($pattern) {
 	if (preg_match('/%(\d)%/', $pattern)) {
 		return new Target_multiple_hosts($pattern);
-	} else {
-		return new Target_single_host($pattern);
 	}
+	return new Target_single_host($pattern);
 }
 
 /**
@@ -139,17 +138,17 @@ class URI_changer
 	protected function rewrite_single(&$match) {
 		if ($this->exclude_single($match[0])) {
 			return $match[0];
-		} else {
-			$blog_url = $this->blog_url;
-			if ($this->www_is_optional && $match[0]{0} != '/' && !strstr($match[0], '//www.')) {
-				$blog_url = str_replace('//www.', '//', $blog_url);
-			}
-			if (!$this->rootrelative || strstr($match[0], $blog_url)) {
-				return str_replace($blog_url, $this->get_target_url->for_source($match[0]), $match[0]);
-			} else { // obviously $this->rootrelative is true and we got a root-relative link - else that case won't happen
-				return $this->get_target_url->for_source($match[0]) . $match[0];
-			}
 		}
+
+		$blog_url = $this->blog_url;
+		if ($this->www_is_optional && $match[0]{0} != '/' && !strstr($match[0], '//www.')) {
+			$blog_url = str_replace('//www.', '//', $blog_url);
+		}
+		if (!$this->rootrelative || strstr($match[0], $blog_url)) {
+			return str_replace($blog_url, $this->get_target_url->for_source($match[0]), $match[0]);
+		}
+		// obviously $this->rootrelative is true and we got a root-relative link - else that case won't happen
+		return $this->get_target_url->for_source($match[0]) . $match[0];
 	}
 
 	/**
@@ -161,9 +160,8 @@ class URI_changer
 		$input = explode(',', $this->include_dirs);
 		if ($this->include_dirs == '' || count($input) < 1) {
 			return 'wp\-content|wp\-includes';
-		} else {
-			return implode('|', array_map('quotemeta', array_map('trim', $input)));
 		}
+		return implode('|', array_map('quotemeta', array_map('trim', $input)));
 	}
 
 	/**
@@ -179,9 +177,8 @@ class URI_changer
 		}
 		if ($this->rootrelative) {
 			return '(?:'.$blog_url.')?';
-		} else {
-			return $blog_url;
 		}
+		return $blog_url;
 	}
 
 	/**
@@ -214,9 +211,7 @@ class URI_changer
 		}
 
 		$new_content = preg_replace_callback($regex, array(&$this, 'rewrite_single'), $content);
-
 		return $new_content;
-		
 	}
 
 }
