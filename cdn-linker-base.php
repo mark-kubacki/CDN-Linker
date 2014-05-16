@@ -259,7 +259,7 @@ class URI_changer_for_wordpress extends URI_changer
  * This function actually registers the rewriter.
  * It is called by Wordpress.
  */
-function do_ossdl_off_ob_start() {
+function register_as_output_buffer_handler() {
 	$rewriter = new URI_changer_for_wordpress();
 	$rewriter->register_as_output_buffer();
 }

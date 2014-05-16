@@ -12,12 +12,12 @@ License: RPL 1.5, for Personal Use
 namespace blitznote\wp;
 
 if ( @include_once('cdn-linker-base.php') ) {
-	add_action('template_redirect', 'blitznote\wp\cdn\do_ossdl_off_ob_start');
+	add_action('template_redirect', 'blitznote\wp\cdn\register_as_output_buffer_handler');
 }
 
 /********** WordPress Administrative ********/
 
-function ossdl_off_activate() {
+function on_plugin_activation() {
 	add_option('ossdl_off_cdn_url', get_option('siteurl'));
 	add_option('ossdl_off_include_dirs', 'wp-content,wp-includes');
 	add_option('ossdl_off_exclude', '.php');
@@ -25,17 +25,17 @@ function ossdl_off_activate() {
 	add_option('ossdl_off_www_is_optional', '');
 	add_option('ossdl_off_disable_cdnuris_if_https', '1');
 }
-register_activation_hook( __FILE__, 'blitznote\wp\ossdl_off_activate');
+register_activation_hook( __FILE__, 'blitznote\wp\on_plugin_activation');
 
 /********** WordPress Interface ********/
-add_action('admin_menu', 'blitznote\wp\ossdl_off_menu');
-add_filter('plugin_action_links', 'blitznote\wp\ossdl_off_plugin_actions', 10, 2);
+add_action('admin_menu', 'blitznote\wp\add_to_admin_sidebar_menu');
+add_filter('plugin_action_links', 'blitznote\wp\add_to_plugin_actions', 10, 2);
 
-function ossdl_off_menu() {
-	add_options_page('CDN Linker', 'CDN Linker', 'manage_options', __FILE__, 'blitznote\wp\ossdl_off_options');
+function add_to_admin_sidebar_menu() {
+	add_options_page('CDN Linker', 'CDN Linker', 'manage_options', __FILE__, 'blitznote\wp\on_handle_admin_page');
 }
 
-function ossdl_off_plugin_actions($links, $file) {
+function add_to_plugin_actions($links, $file) {
 	static $this_plugin;
 	if (!$this_plugin) {
 		$this_plugin = plugin_basename(__FILE__);
@@ -48,7 +48,7 @@ function ossdl_off_plugin_actions($links, $file) {
 	return $links;
 }
 
-function ossdl_off_options() {
+function on_handle_admin_page() {
 	if (!empty($_POST) && check_admin_referer('save-options', 'ossdl-nonce')) {
 		// Yes, this URL is not subject to esc_url() or esc_url_raw() (please don’t report it), because:
 		// 1) Only the owner of the installation can change this setting — if he/she wants something odd here (javascript:…; HTML fragments), we allow for it!
