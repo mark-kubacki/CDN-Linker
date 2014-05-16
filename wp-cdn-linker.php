@@ -3,7 +3,7 @@
 Plugin Name: CDN Linker
 Plugin URI: https://github.com/wmark/CDN-Linker
 Description: Modifies links pointing to <code>wp-content</code> and/or <code>wp-includes</code> (or whatever you configure) by replacing your ‘blog_url’ with a custom one. Enables you to pull static files, such as images, CSS or JS, from a different host, mirror or CDN.
-Version: 1.4.1
+Version: 1.4.2
 Author: W-Mark Kubacki
 Author URI: http://mark.ossdl.de/
 License: RPL 1.5, for Personal Use
