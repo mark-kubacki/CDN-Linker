@@ -4,7 +4,7 @@ CDN Linker - Wordpress Plugin
 :Info: See `github <http://github.com/wmark/CDN-Linker>`_ for the latest source.
 :Author: W-Mark Kubacki <wmark@hurrikane.de>
 :Tags: CDN,links,cloudfront,simplecdn,media,performance,distribution,accelerator,content,speed,cloud
-:Requirements: Wordpress 2.7 – 3.9.1, PHP >= 5.3
+:Requirements: Wordpress 2.7 – 3.9.1, PHP >= 5.3 or HHVM >= 3.0.0
 
 Rewrites links to static files to your own CDN network.
 
@@ -43,7 +43,7 @@ Before asking for support please upgrade to the latest non-beta version of CDN L
   Feel free to email me a link to the question.
 * … Only if you know the cause, down to the line, function or concept, please open a ticket on Github_.
   Please add to it a list of your installed plugins and the URL of your blog and the CDN host.
-  You can provide the latter URLs by separate email, if you are not comfortable publishing it.
+  You can provide the latter URLs by separate email, if you are not comfortable with publishing it.
 * I will happily discuss your feature requests and ideas for further development if you send me an email.
 
 Support you expect to receive free of charge is never urgent.
@@ -105,9 +105,14 @@ Troubleshooting
 ================
 
 Disqus
-  Either uncheck `rewrite root-relative refs` or add `count.js` to `exclude if substring`.
+  Either uncheck `rewrite root-relative refs` or add `count.js` and `embed.js` to `exclude if substring`.
 
 Livefyre, IntenseDebate, and Juvia
   No issues.
+
+HHVM
+  Please note issue `1854 <//github.com/facebook/hhvm/issues/1854>`_.
+  For CDN Linker’s *post-processing* feature you will have to install `hhvm-zmq <//github.com/duxet/hhvm-zmq>`_
+  (monitor issue `1214 <//github.com/facebook/hhvm/issues/1214>`_) or resort to Redis.
 
 __ Mark_
