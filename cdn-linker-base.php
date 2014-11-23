@@ -135,7 +135,7 @@ class URI_changer
 	 * @param String $match An URI as candidate for rewriting
 	 * @return String the unmodified URI if it is not to be rewritten, otherwise a modified one pointing to CDN
 	 */
-	protected function rewrite_single(&$match) {
+	protected function rewrite_single($match) {
 		if ($this->exclude_single($match[0])) {
 			return $match[0];
 		}
