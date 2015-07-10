@@ -1,5 +1,5 @@
 ====================================
-CDN Linker - Wordpress Plugin
+CDN Linker for Wordpress and Magento
 ====================================
 .. image:: https://drone.io/github.com/wmark/CDN-Linker/status.png
    :target: https://drone.io/github.com/wmark/CDN-Linker/latest
@@ -12,11 +12,14 @@ CDN Linker - Wordpress Plugin
 *Author*
   W. Mark Kubacki <wmark@hurrikane.de>
 
+*License*
+  RPL v1.5, for non-commercial Personal Use (§ 1.11)
+
 *Tags*
   CDN,links,cloudfront,simplecdn,media,performance,distribution,accelerator,content,speed,cloud
 
 *Requirements*
-  Wordpress 2.7 – 3.9.1, PHP >= 5.3 or HHVM >= 3.0.0
+  Wordpress 2.7 – 4.x, PHP ≥ 5.3 or HHVM ≥ 3.3.0
 
 Rewrites links to static files to your own CDN network.
 
@@ -29,7 +32,7 @@ Enables you to pull static files, such as images, CSS or JS, from a different ho
 You could upload your files to S3, CloudFront or a host dedicated to serving static files.
 For S3/Cloudfront, see this script_ to help you with uploading/synchronizing your blog files.
 
-.. _script:    http://mark.ossdl.de/2009/09/how-to-copy-your-wordpress-files-to-cloudfront-efficiently/
+.. _script:    https://arte.technologi.ae/2009/09/how-to-copy-your-wordpress-files-to-cloudfront-efficiently/
 
 License
 ========
@@ -37,6 +40,8 @@ Licensed under the Reciprocal Public License, Version 1.5, for Personal Use as d
 (http://www.opensource.org/licenses/rpl1.5).
 
 Else, please contact me by email for an individual license.
+I will need the number of sites and servers you are running to make you an offer
+(which is a tip of 10 to 20 EUR in most cases).
 
 Installation
 =============
@@ -51,14 +56,12 @@ Support
 
 Before asking for support please upgrade to the latest non-beta version of CDN Linker!
 
-* If something doesn't work and you don't know why, please ask on StackExchange_.
-  Feel free to email me a link to the question.
-* … Only if you know the cause, down to the line, function or concept, please open a ticket on Github_.
-  Please add to it a list of your installed plugins and the URL of your blog and the CDN host.
-  You can provide the latter URLs by separate email, if you are not comfortable with publishing it.
 * I will happily discuss your feature requests and ideas for further development if you send me an email.
-
-Support you expect to receive free of charge is never urgent.
+* Please understand that individual support is not free of charge.
+  Attach to your initial email a list of all installed plugins, and the two HTML files (just text, no images)
+  you receive when running with and without CDN Linker being enabled.
+  Please remember to mention the URL to your site as well as your license number or Paypal transaction ID, if you have it.
+* The cause of empty pages is, in all cases as of now, a different caching plugin which already does rewriting of links.
 
 .. _StackExchange:  http://wordpress.stackexchange.com/questions/tagged/plugins
 .. _Github:         https://github.com/wmark/CDN-Linker/issues

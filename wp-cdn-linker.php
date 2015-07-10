@@ -92,6 +92,13 @@ function on_handle_admin_page() {
 		<form method="post" action="">
 		<table class="form-table"><tbody>
 			<tr valign="top">
+				<th scope="row"><label for="ossdl_off_confirm"><strike>for profit</strike></label></th>
+				<td>
+					<input type="checkbox" name="ossdl_off_confirm" />
+					<span class="description">Yes, I have understood that I need to license this copy of CDN Linker if this site is either commercial or not for personal use.</span>
+				</td>
+			</tr>
+			<tr valign="top">
 				<th scope="row"><label for="ossdl_off_cdn_url">CDN URL</label></th>
 				<td>
 					<input type="text" name="ossdl_off_cdn_url" value="<?php echo(esc_attr(get_option('ossdl_off_cdn_url'))); ?>" size="64" class="regular-text code" />
