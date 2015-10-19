@@ -81,7 +81,7 @@ function target_url_strategy_for($pattern) {
  */
 class URI_changer
 {
-	/** String: the blog's URL ( get_option('siteurl') ) */
+	/** String: the blog's URL ( get_option('home') ) */
 	var $blog_url		= null;
 	/** Target_URL_Strategy: results in URL of a CDN domain */
 	var $get_target_url	= null;
@@ -105,7 +105,8 @@ class URI_changer
 	function __construct($blog_url, Target_URL_Strategy $get_target_url, $include_dirs,
 			array $excludes, $root_relative, $www_is_optional,
 			$https_deactivates_rewriting) {
-		$this->blog_url		= $blog_url;
+		$root_location = get_option('ossdl_site_root') ? 'home' : 'siteurl';
+		$this->$root_location = $blog_url;
 		$this->get_target_url	= $get_target_url;
 		$this->include_dirs	= $include_dirs;
 		$this->excludes		= $excludes;
@@ -113,7 +114,6 @@ class URI_changer
 		$this->www_is_optional	= $www_is_optional;
 		$this->https_deactivates_rewriting = $https_deactivates_rewriting;
 	}
-
 	/**
 	 * Determines whether to exclude a match.
 	 *
@@ -140,7 +140,8 @@ class URI_changer
 			return $match[0];
 		}
 
-		$blog_url = $this->blog_url;
+		$blog_location2= get_option('ossdl_site_root') ? 'home':'siteurl';
+		$blog_url = $this->$blog_location2;
 		if ($this->www_is_optional && $match[0]{0} != '/' && !strstr($match[0], '//www.')) {
 			$blog_url = str_replace('//www.', '//', $blog_url);
 		}
@@ -170,7 +171,9 @@ class URI_changer
 	 * @return String regexp pattern such as {@code '(?:http://(?:www\.)?example\.com)?'}
 	 */
 	protected function blog_url_to_pattern() {
-		$blog_url = quotemeta($this->blog_url);
+		$blog_location = get_option('ossdl_site_root')? 'home' : 'blog_url';
+		$rewrite_blog_url = $this->$blog_location;
+		$blog_url = quotemeta($rewrite_blog_url);
 		$max_occurences =  1; // due to PHP's stupidity this must be a variable
 		if ($this->www_is_optional && strstr($blog_url, '//www\.')) {
 			$blog_url = str_replace('//www\.', '//(?:www\.)?', $blog_url, $max_occurences);
@@ -220,13 +223,15 @@ class URI_changer
  * This is called by Wordpress.
  */
 function register_as_output_buffer_handler() {
-	if (get_option('siteurl') == trim(get_option('ossdl_off_cdn_url'))) {
+	$blog_location = get_option('ossdl_site_root')? 'home' : 'siteurl';
+	$blog_locale = get_option($blog_location);
+	if ($blog_locale == trim(get_option('ossdl_off_cdn_url'))) {
 		return;
 	}
 
 	$excludes = array_map('trim', explode(',', get_option('ossdl_off_exclude')));
 	$rewriter = new URI_changer(
-		get_option('siteurl'),
+		get_option($blog_location),
 		target_url_strategy_for(trim(get_option('ossdl_off_cdn_url'))),
 		trim(get_option('ossdl_off_include_dirs')),
 		$excludes,
