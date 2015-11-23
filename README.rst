@@ -3,7 +3,7 @@ CDN Linker for Wordpress and Magento
 ====================================
 .. image:: https://drone.io/github.com/wmark/CDN-Linker/status.png
    :target: https://drone.io/github.com/wmark/CDN-Linker/latest
-.. image:: https://coveralls.io/repos/wmark/CDN-Linker/badge.png?branch=master
+.. image:: https://coveralls.io/repos/wmark/CDN-Linker/badge.svg?branch=master
    :target: https://coveralls.io/r/wmark/CDN-Linker?branch=master
 
 *Info*
