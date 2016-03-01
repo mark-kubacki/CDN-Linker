@@ -4,6 +4,7 @@ test.php export-ignore
 
 *.php text eol=lf diff=php
 *.rst text=auto
+composer.json text=auto
 test/samples/*.gz diff=gzip-html
 
 .gitattributes text=auto

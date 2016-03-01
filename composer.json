@@ -1,0 +1,18 @@
+{
+  "name": "wmark/CDN-Linker",
+  "type": "wordpress-plugin",
+  "keywords": [
+    "wordpress",
+    "plugin",
+    "roots"
+  ],
+  "config": {
+    "bin-dir": "bin/"
+  },
+  "require": {
+    "php": ">=5.5"
+  },
+  "require-dev": {
+    "atoum/atoum": ">=2.1"
+  }
+}

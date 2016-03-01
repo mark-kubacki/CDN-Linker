@@ -3,21 +3,16 @@
  * These tests need PHP's "zlib" extension.
  *
  * Run with:
- *     php -d phar.readonly=0 mageekguy.atoum.phar --update || \
- *     curl -LOR http://downloads.atoum.org/nightly/mageekguy.atoum.phar
- *     php test.php
+ *     atoum -f test.php
  */
 
 namespace blitznote\wp\cdn\tests\units;
 
-require_once('mageekguy.atoum.phar');
-
 include('cdn-linker-base.php');
 
-use \mageekguy\atoum;
 use \blitznote\wp\cdn;
 
-class URI_changer extends atoum\test
+class URI_changer extends \atoum
 {
 
 	public function readCompressedSample($filename) {
