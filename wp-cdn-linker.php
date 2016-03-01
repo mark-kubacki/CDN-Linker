@@ -18,8 +18,7 @@ if ( @include_once('cdn-linker-base.php') ) {
 /********** WordPress Administrative ********/
 
 function on_plugin_activation() {
-	add_option('ossdl_site_root', '');
-	add_option('ossdl_off_cdn_url', get_option($ossdl_site_root? 'home' : 'siteurl'));
+	add_option('ossdl_off_cdn_url', get_option('siteurl'));
 	add_option('ossdl_off_include_dirs', 'wp-content,wp-includes');
 	add_option('ossdl_off_exclude', '.php');
 	add_option('ossdl_off_rootrelative', '');
@@ -54,7 +53,6 @@ function on_handle_admin_page() {
 		// Yes, this URL is not subject to esc_url() or esc_url_raw() (please don’t report it), because:
 		// 1) Only the owner of the installation can change this setting — if he/she wants something odd here (javascript:…; HTML fragments), we allow for it!
 		update_option('ossdl_off_cdn_url', $_POST['ossdl_off_cdn_url']);
-		update_option('ossdl_site_root', $_POST['ossdl_site_root'] ? 'home' : 'siteurl');
 		update_option('ossdl_off_include_dirs', $_POST['ossdl_off_include_dirs'] == '' ? 'wp-content,wp-includes' : $_POST['ossdl_off_include_dirs']);
 		if(strstr($_POST['ossdl_off_exclude'], '.php')) {
 			update_option('ossdl_off_exclude', $_POST['ossdl_off_exclude']);
@@ -66,23 +64,19 @@ function on_handle_admin_page() {
 		}
 		// checkboxes which are not checked are sometimes not sent, hence the additional calls to isset($_POST(…))
 		$ossdl_off_rootrelative = isset($_POST['ossdl_off_rootrelative']) ? !!$_POST['ossdl_off_rootrelative'] : false;
-		$ossdl_site_root = isset($_POST['ossdl_site_root']) ? !!$_POST['ossdl_site_root'] : false;
 		$ossdl_off_www_is_optional = isset($_POST['ossdl_off_www_is_optional']) ? !!$_POST['ossdl_off_www_is_optional'] : false;
 		$ossdl_off_disable_cdnuris_if_https = isset($_POST['ossdl_off_disable_cdnuris_if_https']) ? !!$_POST['ossdl_off_disable_cdnuris_if_https'] : false;
 		update_option('ossdl_off_rootrelative', $ossdl_off_rootrelative);
 		update_option('ossdl_off_www_is_optional', $ossdl_off_www_is_optional);
 		update_option('ossdl_off_disable_cdnuris_if_https', $ossdl_off_disable_cdnuris_if_https);
-		update_option('ossdl_site_root', $ossdl_site_root);
 	}
 
 	$example_file_rr = '/wp-includes/images/rss.png';
-
-	$cdn_site_root = get_option('ossdl_site_root') ? 'home' : 'siteurl';
-	if (get_option('ossdl_off_cdn_url') == get_option($cdn_site_root)) {
-		$example_cdn_uri = str_replace('http://', 'http://cdn.', str_replace('www.', '', get_option($cdn_site_root)))
+	if (get_option('ossdl_off_cdn_url') == get_option('siteurl')) {
+		$example_cdn_uri = str_replace('http://', 'http://cdn.', str_replace('www.', '', get_option('siteurl')))
 				. $example_file_rr;
 	} else {
-		$example_uri = get_option($cdn_site_root) . $example_file_rr;
+		$example_uri = get_option('siteurl') . $example_file_rr;
 		$get_target_url = cdn\target_url_strategy_for(trim(get_option('ossdl_off_cdn_url')));
 		$example_cdn_uri = $get_target_url->for_source($example_uri) . $example_file_rr;
 	}
@@ -108,20 +102,13 @@ function on_handle_admin_page() {
 				<th scope="row"><label for="ossdl_off_cdn_url">CDN URL</label></th>
 				<td>
 					<input type="text" name="ossdl_off_cdn_url" value="<?php echo(esc_attr(get_option('ossdl_off_cdn_url'))); ?>" size="64" class="regular-text code" />
-					<span class="description">The new URL to be used in place of <?php echo(get_option($cdn_site_root)); ?> for rewriting. No trailing <code>/</code> please. E.&thinsp;g. <code><?php echo($example_cdn_uri); ?></code>.
+					<span class="description">The new URL to be used in place of <?php echo(get_option('siteurl')); ?> for rewriting. No trailing <code>/</code> please. E.&thinsp;g. <code><?php echo($example_cdn_uri); ?></code>.
 					&mdash;
 					You can use <code>%4%</code> (a number between 1 and 9, surrounded by percent signs) to use that many hostname variations.
 					Should be between 2 and 4, with 4 being beyond an universal optimum.
 					If you are going to use 3 or more then make sure they have different IPs or
 					<a href="http://statichtml.com/2010/use-unique-ips-for-sharded-asset-hosts.html">some routers will block requests</a> to them.
 					</span>
-				</td>
-			</tr>
-			<tr valign="top">
-				<th scope="row"><label for="ossdl_site_root">Use home or site url</label></th>
-				<td>
-					<input type="checkbox" name="ossdl_site_root" <?php echo(!!get_option('ossdl_site_root') ? 'checked="1" ' : '') ?>value="true" />
-					<span class="description">Check this if you want to use your site address instead of your WordPress url</span>
 				</td>
 			</tr>
 			<tr valign="top">
