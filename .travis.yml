@@ -15,6 +15,7 @@ branches:
 matrix:
   allow_failures:
     - php: '5.5'
+    - php: hhvm
 
 install:
   - composer install -n --dev
