@@ -1,8 +1,8 @@
 ====================================
 CDN Linker for Wordpress and Magento
 ====================================
-.. image:: https://travis-ci.org/wmark/CDN-Linker.svg?branch=master
-   :target: https://travis-ci.org/wmark/CDN-Linker
+.. image:: https://hub.blitznote.com/mark/CDN-Linker/badges/master/build.svg
+   :target: https://hub.blitznote.com/mark/CDN-Linker/pipelines
 .. image:: https://coveralls.io/repos/wmark/CDN-Linker/badge.svg?branch=master
    :target: https://coveralls.io/r/wmark/CDN-Linker?branch=master
 
