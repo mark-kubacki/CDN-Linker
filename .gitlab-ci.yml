@@ -25,3 +25,4 @@ unittest_with_php_7.0:
 unittest_with_php_7.1:
   <<: *howto_unit_test
   image: blitznote/ci-php:7.1
+  allow_failure: true
