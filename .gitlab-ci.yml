@@ -3,16 +3,12 @@
   before_script:
   - composer install -n --dev
   script:
-  -  bin/atoum -f test.php
+  - bin/atoum -f test.php
   cache:
     key: "$CI_BUILD_STAGE"
     paths:
     - bin
     - vendor
-
-unittest_with_php_5.5:
-  <<: *howto_unit_test
-  image: blitznote/ci-php:5.5
 
 unittest_with_php_5.6:
   <<: *howto_unit_test
@@ -25,4 +21,8 @@ unittest_with_php_7.0:
 unittest_with_php_7.1:
   <<: *howto_unit_test
   image: blitznote/ci-php:7.1
+
+unittest_with_php_7.2:
+  <<: *howto_unit_test
+  image: blitznote/ci-php:7.2
   allow_failure: true

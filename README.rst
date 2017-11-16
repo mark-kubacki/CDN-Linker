@@ -19,7 +19,7 @@ CDN Linker for Wordpress and Magento
   CDN,links,cloudfront,simplecdn,media,performance,distribution,accelerator,content,speed,cloud
 
 *Requirements*
-  Wordpress 2.7 – 4.x, PHP ≥ 5.3 or HHVM ≥ 3.3.0
+  Wordpress 2.7 – 4.x, PHP ≥5.6 or HHVM ≥ .3.0
 
 Rewrites links to static files to your own CDN network.
 
@@ -122,11 +122,7 @@ Troubleshooting
 Disqus
   Either uncheck `rewrite root-relative refs` or add `count.js` and `embed.js` to `exclude if substring`.
 
-Livefyre, IntenseDebate, and Juvia
-  No issues.
-
 HHVM
-  Please note issue `1854 <//github.com/facebook/hhvm/issues/1854>`_.
   For CDN Linker’s *post-processing* feature you will have to install `hhvm-zmq <//github.com/duxet/hhvm-zmq>`_
   (monitor issue `1214 <//github.com/facebook/hhvm/issues/1214>`_) or resort to Redis.
 
