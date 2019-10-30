@@ -16,7 +16,7 @@ interface Target_URL_Strategy
 	 * @param String $url will either be something like 'http://test.local/xyz/zdf.ext' or '/xyz/zdf.ext'
 	 * @return String contains the CDN url - e.g. 'http://cdn.test.local'
 	 */
-	public function for_source(&$url);
+	public function for_source($url);
 
 }
 
@@ -29,7 +29,7 @@ class Target_single_host implements Target_URL_Strategy
 		$this->cdn_url = $cdn_url;
 	}
 
-	public function for_source(&$url) {
+	public function for_source($url) {
 		return $this->cdn_url;
 	}
 
@@ -54,7 +54,7 @@ class Target_multiple_hosts implements Target_URL_Strategy
 		$this->fragment = $m[0];
 	}
 
-	public function for_source(&$url) {
+	public function for_source($url) {
 		$n = ( hexdec(substr(md5($url), 0, 1)) % $this->variations ) + 1;
 		return str_replace($this->fragment, $n, $this->cdn_pattern);
 	}
@@ -120,7 +120,7 @@ class URI_changer
 	 * @param String $match URI to examine
 	 * @return Boolean true if to exclude given match from rewriting
 	 */
-	protected function exclude_single(&$match) {
+	protected function exclude_single($match) {
 		foreach ($this->excludes as $badword) {
 			if (!!$badword && stristr($match, $badword) != false) {
 				return true;
@@ -189,7 +189,7 @@ class URI_changer
 	 * @param String $content the raw HTML of the page from Wordpress, meant to be returned to the requester but intercepted here
 	 * @return String modified HTML with replaced links - will be served by the HTTP server to the requester
 	 */
-	public function rewrite(&$content) {
+	public function rewrite($content) {
 		if ($this->https_deactivates_rewriting && isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == 'on') {
 			return $content;
 		}
@@ -210,7 +210,7 @@ class URI_changer
 			$regex .= '(?=[\"\')])#';
 		}
 
-		$new_content = preg_replace_callback($regex, array(&$this, 'rewrite_single'), $content);
+		$new_content = preg_replace_callback($regex, array($this, 'rewrite_single'), $content);
 		return $new_content;
 	}
 
@@ -235,5 +235,5 @@ function register_as_output_buffer_handler() {
 		!!trim(get_option('ossdl_off_disable_cdnuris_if_https'))
 	);
 
-	ob_start(array(&$rewriter, 'rewrite'));
+	ob_start(array($rewriter, 'rewrite'));
 }
