@@ -1,8 +1,6 @@
 ====================================
 CDN Linker for Wordpress and Magento
 ====================================
-.. image:: https://hub.blitznote.com/mark/CDN-Linker/badges/master/build.svg
-   :target: https://hub.blitznote.com/mark/CDN-Linker/pipelines
 .. image:: https://coveralls.io/repos/wmark/CDN-Linker/badge.svg?branch=master
    :target: https://coveralls.io/r/wmark/CDN-Linker?branch=master
 
@@ -10,7 +8,7 @@ CDN Linker for Wordpress and Magento
   See `github <http://github.com/wmark/CDN-Linker>`_ for the latest source.
 
 *Author*
-  W. Mark Kubacki <wmark@hurrikane.de>
+  Mark Kubacki <wmark@hurrikane.de>
 
 *License*
   RPL v1.5, for non-commercial Personal Use (§ 1.11)
@@ -19,7 +17,7 @@ CDN Linker for Wordpress and Magento
   CDN,links,cloudfront,simplecdn,media,performance,distribution,accelerator,content,speed,cloud
 
 *Requirements*
-  Wordpress 2.7 – 4.x, PHP ≥5.6 or HHVM ≥ .3.0
+  Wordpress 2.7 – 5.5 and later, PHP ≥5.6 or HHVM ≥ .3.0
 
 Rewrites links to static files to your own CDN network.
 
@@ -30,9 +28,6 @@ by replacing your ‘blog_url’ with a custom one.
 Enables you to pull static files, such as images, CSS or JS, from a different host, mirror or CDN.
 
 You could upload your files to S3, CloudFront or a host dedicated to serving static files.
-For S3/Cloudfront, see this script_ to help you with uploading/synchronizing your blog files.
-
-.. _script:    https://arte.technologi.ae/2009/09/how-to-copy-your-wordpress-files-to-cloudfront-efficiently/
 
 License
 ========
@@ -113,7 +108,7 @@ What other plugins do you recommend?
   decrease load on your server. I recommend SuperCache-Plus_ as it will maintain, update and create that static files from
   dynamic content for you. The CDN Linker is compatible.
 
-.. _Mark:            http://mark.ossdl.de/
+.. _Mark:            https://github.com/wmark/
 .. _SuperCache-Plus: http://murmatrons.armadillo.homeip.net/features/experimental-eaccelerator-wp-super-cache
 
 Troubleshooting
