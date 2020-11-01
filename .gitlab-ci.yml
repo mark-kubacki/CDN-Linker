@@ -1,28 +1,32 @@
-.unit_test: &howto_unit_test
-  stage: test
-  before_script:
-  - composer install -n --dev
+get_dependencies:
+  stage: build
+  image: composer
   script:
-  - bin/atoum -f test.php
+  - composer install -n
   cache:
     key: "$CI_BUILD_STAGE"
     paths:
     - bin
     - vendor
 
-unittest_with_php_5.6:
-  <<: *howto_unit_test
-  image: blitznote/ci-php:5.6
+.unit_test: &howto_unit_test
+  stage: test
+  script:
+  - bin/atoum -f test.php
 
-unittest_with_php_7.0:
+test:php_5:
   <<: *howto_unit_test
-  image: blitznote/ci-php:7.0
+  image: 'php:5'
 
-unittest_with_php_7.1:
+test:php_7:
   <<: *howto_unit_test
-  image: blitznote/ci-php:7.1
+  image: 'php:7'
 
-unittest_with_php_7.2:
+test:php_latest:
   <<: *howto_unit_test
-  image: blitznote/ci-php:7.2
+  image: 'php'
+
+test:php_RC:
+  <<: *howto_unit_test
+  image: 'php:rc'
   allow_failure: true

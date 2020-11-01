@@ -1,0 +1,15 @@
+tags: ['php', 'composer', 'atoum']
+timeout: 180s
+
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'build unit test environment'
+  args: ['build', '--file=Dockerfile.testenv', '--tag=localhost/php/composer', '.']
+
+- name: 'localhost/php/composer'
+  id: 'get dependencies'
+  args: ['composer', 'install', '-n']
+
+- name: 'mirror.gcr.io/library/php'
+  id: 'unit tests'
+  args: ['bin/atoum', '-f', 'test.php']
