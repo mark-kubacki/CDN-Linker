@@ -141,7 +141,7 @@ class URI_changer
 		}
 
 		$blog_url = $this->blog_url;
-		if ($this->www_is_optional && $match[0]{0} != '/' && !strstr($match[0], '//www.')) {
+		if ($this->www_is_optional && $match[0][0] != '/' && !strstr($match[0], '//www.')) {
 			$blog_url = str_replace('//www.', '//', $blog_url);
 		}
 		if (!$this->rootrelative || strstr($match[0], $blog_url)) {
