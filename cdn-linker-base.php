@@ -225,6 +225,7 @@ function register_as_output_buffer_handler() {
 	}
 
 	$excludes = array_map('trim', explode(',', get_option('ossdl_off_exclude')));
+    $excludes = apply_filters('cdn-linker-global-excludes', $excludes);
 	$rewriter = new URI_changer(
 		get_option('siteurl'),
 		target_url_strategy_for(trim(get_option('ossdl_off_cdn_url'))),
